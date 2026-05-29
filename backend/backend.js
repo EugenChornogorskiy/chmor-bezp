@@ -2,7 +2,7 @@ import express from 'express';
 import { v4 as uuidv4 } from 'uuid';
 import pkg from 'pg';
 const { Pool } = pkg;
-import redis from 'redis';
+import { createClient } from 'redis';
 import fs from 'fs';
 import jwt from "jsonwebtoken";
 import jwksClient from "jwks-rsa";
@@ -35,17 +35,8 @@ function getKey(header, callback) {
     const signingKey = key.getPublicKey();
     callback(null, signingKey);
   });
-}
-async function loadConfig() {
-  try {
-    const configContent = fs.readFileSync('/app/app.config.json', 'utf8');
-    return JSON.parse(configContent); 
-  } catch (err) {
-    console.log('Config file not found, using defaults');
-    return { instanceName: 'default', timeout: 30000, limit: 100, cacheTTL: 10};
-  }
 } 
-export function auth(req, res, next) {
+function auth(req, res, next) {
   const header = req.headers.authorization;
 
   if (!header) {
@@ -101,15 +92,11 @@ const pgPool = new Pool({
   port: 5432,
 }); 
 
-const redisClient = redis.createClient({
+const redisClient = createClient({
   url: `redis://redis:6379`,
-});
-redisClient.connect(); 
- 
-
-init();
+}); 
   
-const appConfig = await loadConfig()
+const appConfig = {  instanceName: 'default', timeout: 30000, limit: 100, cacheTTL: 10 }; 
 const instanceId = process.env.INSTANCE_ID || appConfig.instanceName || "default-instance";
  
  
@@ -245,9 +232,18 @@ app.get('/health', async (req, res) => {
   });
 });
   
-const server = app.listen(PORT, () => {
-  console.log(`Backend running on port ${PORT}`);
-});
+let server 
+if (process.env.NODE_ENV !== 'test') { 
+
+  server = app.listen(PORT, () => {
+    console.log(`Backend running on port ${PORT}`);
+  });
+}
+export default app;
+export { init, shutdown, auth };
+async function shutdown() { 
+  await pgPool.end(); 
+}
 process.on('SIGTERM', async () => {
   console.log('SIGTERM');
 
@@ -258,4 +254,4 @@ process.on('SIGTERM', async () => {
     console.log('HTTP server closed');
     process.exit(0);
   });
-});
+}); 
