@@ -1,0 +1,1422 @@
+@import "tailwindcss";    
+        html{
+            height: 100%;
+        }
+        body {
+            height: 100%;
+            color: white; 
+            font-family: "Roboto", serif;
+            background-color: #1d1d1d;  
+            display: block;
+        }
+        #root{
+            height: 100%;
+        }
+        header {
+            width: 100%;
+            height: 70px; 
+            background-color: rgb(204, 22, 22);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+            position: fixed;  
+            top: 0px;
+        } 
+        #nav-items{
+            width: 95%;
+            margin: auto;
+            display: flex;
+            align-items: center;
+            height: 100%; 
+            position: relative;  
+            justify-content: space-between;
+        }
+        #nav-ball{
+            width: 60px;
+            height: 60px;   
+        }
+        .rand{
+            text-align: center;  
+            margin-top: 20px;
+            font-family: "Roboto", serif;
+            font-size: 1.2em;   
+            width: 200px;
+            height: 50px; 
+            cursor: pointer;   
+            user-select: none;  
+        }
+        #filters{
+            text-align: center;   
+            font-family: "Roboto", serif;
+            font-size: 1.1em;   
+            width: 75px; 
+            cursor: pointer;   
+            user-select: none; 
+            letter-spacing: 1px;
+            display: flex;
+        } 
+        #remove-filters{
+            height: 25px;
+            background-color: #17ac67e1;
+            border-radius: 10px; 
+            padding-left: 10px;
+            padding-right: 10px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        #remove-filters:hover{
+            opacity: 0.8;
+        }
+        #rand:hover{
+            opacity: 0.8;
+        }
+        #logo{
+            width: 60px;
+            height: 60px;  
+        } 
+        #logo-search{
+            width: 60px;
+            height: 60px;  
+        }
+        #pokemons-count{ 
+            position: absolute; 
+            top: 0px;
+            right: 0px;
+            margin-right: 20px;
+            margin-top: 10px;
+
+        }
+        .slider-container {
+            width: 200px;
+            position: relative;  
+        }
+        .hp-container{ 
+        }
+        .slider {
+            position: absolute; 
+            width: 200px;
+            -webkit-appearance: none; 
+            height: 6px;  
+            border-radius: 1em;
+            outline: none; 
+            margin-top: 7px;
+        }
+
+        .slider::-webkit-slider-thumb {    
+            -webkit-appearance: none;
+            height: 12px; 
+            width: 12px; 
+            position: relative;
+            z-index: 2; 
+            -webkit-appearance: none; 
+            appearance: none;
+            width: 12px; 
+            height: 12px;
+            background: #ff7300;
+            border-radius: 50%;
+            cursor: pointer;  
+        }  
+        .slider::-webkit-slider-thumb:hover { 
+            background: #da6200; 
+        }  
+        .slider-hp { 
+            width: 130px;
+            -webkit-appearance: none; 
+            height: 6px;  
+            border-radius: 1em;
+            outline: none; 
+            margin-top: 7px;
+        }
+
+        .slider-hp::-webkit-slider-thumb {    
+            display: none;
+        }  
+        .slider::-webkit-slider-thumb:hover { 
+            background: #da6200; 
+        }  
+        #filter-panel{
+            position: absolute;   
+            width: 100%;
+            height: 250px;
+            background-color: #1d1d1d; 
+            z-index: 100;
+            border-radius: 10px;
+            display: flex;
+            flex-wrap: wrap;
+            align-content: flex-start;  
+        }
+        .range-stat{
+            display: flex;
+        }
+        #panel-filters{
+            width: 100%;
+            text-align: center;   
+            font-family: "Roboto", serif;
+            font-size: 1.4em;   
+            margin-top: 10px; 
+            cursor: pointer;   
+            user-select: none; 
+            letter-spacing: 1px;
+            height: 50px; 
+        }
+        .panel-filters-create{
+            display: flex;
+        }
+        .panel-filters{  
+            max-width: 500px;
+        }
+        #filter-back{
+            position: relative;
+            width: 100%;
+            height: 100%;
+            position: fixed;
+            top: 0%; 
+            left: 0%;
+            background-color: rgba(128, 128, 128, 0.5) ;
+            z-index: 100;
+        }
+        #filter_btns{
+            position: absolute;
+            bottom: 0px;
+            left: 0px;
+            right: 0px; 
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: center;
+            gap: 50px;
+        }
+        .filter_btn{
+            color: snow;  
+            font-family: "Roboto", serif;
+            font-size: 1.25em;  
+            background-color: rgb(255, 115, 0); 
+            cursor: pointer;  
+            border: none;
+            border-radius: 1em;  
+            padding-left: 20px;
+            padding-right: 20px;
+            padding-top: 5px;
+            padding-bottom: 5px;
+        }
+        .filter_btn:hover{
+            opacity: 0.8;
+        }
+        #recomendation{
+            position: absolute;
+            right: 20px;
+            bottom: 20px;
+            background-color: #3498db;
+            border-radius: 10px;
+            padding: 20px;
+            padding-top: 5px;
+            padding-bottom: 5px;
+        }
+        #random-team{
+            background-color: #da6200;
+            border-radius: 15px;
+            position: absolute;
+            left: 20px;
+            bottom: 20px;
+            padding: 20px;
+            padding-top: 5px;
+            padding-bottom: 5px;
+            cursor: pointer;
+            font-size: 1.15em;
+        }
+        #start-battle:hover{
+            background-color: #af0000;
+        }
+        #start-battle{
+            background-color: #da0000;
+            border-radius: 15px;
+            position: absolute;
+            left: 50%;
+            bottom: 10px;
+            padding: 20px;
+            padding-top: 5px;
+            padding-bottom: 5px;
+            cursor: pointer;
+            font-size: 1.4em;
+            transform: translate(-50%, -50%);
+            filter: drop-shadow(0 0 6px red);
+        }
+        #random-team:hover{
+            background-color: #be5600;
+        }
+        #search-filter{
+            display: flex; 
+            align-items: center;
+            gap: 20px;
+        } 
+        #logo-search:hover{
+            opacity: 0.9;
+        }
+        #add-team{
+            width: 100px;
+            margin-right: 30px;
+            font-size: 1.1em;
+            cursor: pointer;
+            user-select: none;
+        }
+        #error{
+            color: red;
+            font-size: 3em;
+            display: flex;
+            gap: 50px;
+            margin: 50px;
+        }
+        #error p{
+            padding: 10px;
+        }
+        input{
+            padding-block: 1px;
+            padding-inline: 2px;
+            padding: 1px 0px;
+        }
+        button{
+            padding-block: 1px;
+            padding-inline: 6px;
+        } 
+        #main{
+            height: 100%;
+            display: flex;  
+        } 
+        #Pokeball{
+            width: 100px;
+            height: 100px;
+            cursor: pointer;
+        } 
+        #fav-count:hover{
+            opacity: 0.8;
+        }
+        #table{   
+            width: 100%;
+            max-width: 1200px;  
+            max-height: 720px; 
+            text-align: center;
+            display: flex;   
+            flex-wrap: wrap; 
+            gap: 10px; 
+            animation: fadeIn 0.6s ease-out forwards;
+            opacity: 0;
+            transform: translateY(-30px);
+        }   
+        #wrapper {  
+            width: 100%;
+            height: 100%;
+            max-width: 1200px;  
+            margin: auto; 
+            display: flex;  
+            flex-direction: column;
+            gap: 40px;  
+        }
+        #choose{
+            display: flex;
+            flex-direction: column; 
+            align-items: flex-start;
+        } 
+        #toggle-favorites{
+            cursor: pointer;
+            position: absolute;
+            top: 0px;
+            right: 0px;
+        }
+        #toggle-comparision{
+            cursor: pointer;
+            position: absolute;
+            top: 0px;
+            left: 0px;
+        }
+        #toggle-favorites:hover{
+            opacity: 0.8;
+        }
+        #fav{
+            display: flex; 
+        }
+        #toast-container{
+            position: fixed;
+            z-index: 1000;
+            right: 0px;
+            pointer-events: none; 
+        }
+        #toast-list {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end; 
+            gap: 12px;
+            pointer-events: none; 
+        } 
+        .close-toast{
+            position: absolute;
+            right: 15px;
+            top: 10px;
+            cursor: pointer;
+        }
+        .filter-hp{
+            text-align: left;  
+            position: absolute;
+            bottom: 0px;
+        }
+        .toast-div {
+            position: relative;
+            display: inline-flex;
+            max-width: 450px; 
+            width: auto;
+            box-sizing: border-box;
+            background-color: rgba(51, 255, 0, 0.918);
+            border-radius: 20px; 
+            margin-top: 10px;
+            margin-right: 10px;
+            pointer-events: auto; /* need if close button */
+        }
+        .toast{
+            padding: 20px;
+            padding-right: 30px;
+        }
+        .random{ 
+            color: white;
+            width: 13%;
+            display: flex;
+            flex-direction: column;
+            gap: 50px;
+            text-align: center;
+            align-items: center;
+            justify-content: center;
+            background-color: #17ac67;
+            border-right: rgb(255, 166, 0) 20px solid;
+        }
+        #main .random:nth-child(3){ 
+            border-right: none;
+            border-left: rgb(255, 166, 0) 20px solid; 
+        }
+        #search{   
+            width: 100%;  
+            text-align: center;
+            height: 75px;
+            margin-top: 100px;
+            position: relative; 
+        } 
+        #search-panel{
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .dropdown{  
+            position: relative;   
+        } 
+        .dropdown-list{
+            position: absolute;  
+            max-height: 150px;
+            overflow-y: auto;
+            scrollbar-width: thin; 
+            scrollbar-color: #ff7300 #f0f0f000; 
+            width: 100%;
+            margin-left: 5px;
+            overflow-x: hidden;
+            z-index: 100;
+            text-align: center;
+            
+        }
+        .dropdown-btn{ 
+            background-color: rgb(255, 115, 0);
+            border-radius: 1em; 
+            width: 100%;
+            font-size: 1.05em; 
+        } 
+        .team-dropdown-btn{ 
+            background-color: rgb(255, 115, 0);
+            border-radius: 1em; 
+            width: 110px; 
+            font-size: 1.05em; 
+            cursor: pointer;
+        } 
+        .btns{
+            display: flex;  
+        }
+        #team-left{
+            background-color: #17ac67;
+            border-radius: 10px;
+            cursor: pointer;
+            position: absolute;
+            top: 50% ;
+            right: 0px;
+            width: 25px;
+            height: 25px;
+        }
+        #team-left:hover{
+            opacity: 0.8;
+        }
+        #team-right:hover{
+            opacity: 0.8;
+        }
+        #team-right{
+            background-color: #17ac67;
+            border-radius: 10px;
+            cursor: pointer;
+            position: absolute;
+            top: 50% ;
+            left: 0px;
+            width: 25px;
+            height: 25px;
+        }
+        .filter-type{
+            display: flex; 
+            margin-left: 20px;  
+            width: 100%;
+            gap: 20px; 
+        }
+        .filter-type-range{
+            display: flex; 
+            margin-left: 20px;  
+            width: 100%;
+            gap: 20px; 
+        }
+        .loading-spinner {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                padding: 8px;
+        }
+        .spinner {
+                width: 20px;
+                height: 20px;
+                border: 2px solid #f3f3f3;
+                border-top: 2px solid #3498db;
+                border-radius: 50%;
+                animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+                0% { transform: rotate(0deg); }
+                100% { transform: rotate(360deg); }
+        }
+        .search-results-info {
+                padding: 8px;
+                background: #e8f5e8;
+                border-radius: 4px;
+                margin: 8px 0;
+        }
+        .search-error {
+                padding: 8px;
+                background: #ffe8e8;
+                border-radius: 4px;
+                margin: 8px 0;
+                color: #d63031;
+        }
+        button:disabled {
+                opacity: 0.6;
+                cursor: not-allowed;
+        }
+        .filter-type-range p{
+            width: 130px;
+            text-align: left;
+        }
+        .filter{
+            background-color: #d46000;
+            border-radius: 5px;
+            margin-top: 5px;
+            cursor: pointer;
+        }
+        .filter:hover{
+            background-color: #be5702;
+        }
+        .filters{
+            display: flex;
+            gap: 20px;  
+            height: 30px;
+            margin-top: 20px;
+            margin-left: 20px;
+        }
+        .filters p{
+            height: 25px;
+            background-color: #17ac67e1;
+            border-radius: 10px; 
+            padding-left: 10px;
+            padding-right: 10px;
+            cursor: pointer;
+        }
+        .filters-range{
+            display: flex;
+            gap: 20px;  
+            height: 30px; 
+            margin-left: 20px;
+        }
+        .filters-range p{
+            height: 25px;
+            background-color: #17ac67e1;
+            border-radius: 10px; 
+            padding-left: 10px;
+            padding-right: 10px;
+            cursor: pointer;
+        }
+        .filters p:hover{
+            opacity: 0.7;
+        }
+        #main-left{
+            color: snow;
+            width: 50px;
+            height: 50px;
+            position: absolute; 
+            right: 0px; 
+            top: 20px;
+            font-size: 1.5em;
+            background-color: rgb(255, 115, 0);
+            border: none;
+            border-radius: 10px; 
+            cursor: pointer;  
+        }
+        #main-right{
+            color: snow;
+            width: 50px;
+            height: 50px;
+            position: absolute; 
+            left: 0px; 
+            top: 20px;
+            font-size: 1.5em; 
+            background-color: rgb(255, 115, 0);
+            border: none;
+            border-radius: 0.5em; 
+            cursor: pointer;  
+        }
+        #main-right:hover{
+            opacity: 0.8;
+        }
+        #main-left:hover{
+            opacity: 0.8;
+        }
+        form{
+            display: flex;
+            justify-content: center;  
+        }
+        details{ 
+            margin-left: 30px;
+            width: 150px;
+            cursor: pointer; 
+            user-select: none; 
+            border: 2px solid rgb(255, 115, 0);
+            border-radius: 8px;
+            padding: 3px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1); 
+        } 
+        label {
+            cursor: pointer;
+            position: relative; 
+            user-select: none; 
+            padding-left: 20px;
+        }
+        input[type="radio"]:checked { 
+            accent-color: red;
+            width: 15px;
+            height: 15px;
+            border-radius: 50%; 
+            background-size: cover;
+            background-position: center;
+            transition: 0.2s;
+        } 
+        label:hover{
+            opacity: 0.8;
+        }
+        .pok-card:hover{
+            opacity: 0.7;
+        }
+        .pokemon{
+            position: relative;
+            max-height: 150px;
+        }
+        .img_btn{
+            background: none;
+            border: none;
+            cursor: pointer;   
+            width: 108px;
+            height: 128px;
+        }  
+        .tab_name{
+            width: 100%;
+            max-width: 108px; 
+        } 
+        #inp{  
+            height: 30px;
+            border: none; 
+            border-radius: 1em;  
+            padding-left: 10px;
+            border: 2px solid red;
+        } 
+        #ram{
+            margin-top: 75px;
+            width: 100px;
+            height: 100px;
+            border: 10px grey solid;
+            border-radius: 5px;
+        }
+        #inp_btn{
+            color: snow; 
+            margin-left: 20px; 
+            font-family: "Roboto", serif;
+            font-size: 0.95em;  
+            background-color: rgb(255, 115, 0);
+            width: 75px;
+            height: 30px; 
+            cursor: pointer;  
+            border: none;
+            border-radius: 1em; 
+        }
+        #jsx_btn{
+            color: snow; 
+            margin-left: 20px; 
+            font-family: "Roboto", serif;
+            font-size: 0.95em;  
+            background-color: rgb(255, 115, 0);
+            width: 100px;
+            height: 30px; 
+            cursor: pointer;  
+            border: none;
+            border-radius: 1em; 
+        }
+        #inp_btn:hover{
+            opacity: 0.8;
+        }
+        .error{
+            color: red; 
+            text-align: center;
+        }
+        #error{ 
+            color: red;
+        }
+        @keyframes fadeIn {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        } 
+        #close-modal{
+            position: absolute;
+            right: 0px;
+            background-color: #ff0800;
+            border-radius: 15px;
+            font-size: 1.3em;
+            height: 50px;
+            width: 50px;
+            margin: 10px;
+            cursor: pointer;
+        }
+        #close-modal:hover{ 
+            opacity: 0.8;
+        }
+        #backgr{
+            width: 100%;
+            height: 100%;  
+            background-color: rgba(128, 128, 128, 0.5);
+            z-index: 100;
+        } 
+        #stats-form{
+            position: absolute; 
+            display: flex;
+            top: 50%;
+            left: 50%; 
+            transform: translate(-50%, -50%);
+        }
+        #create-battle-leyer{
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+        }
+        #battle-match{
+            width: 200px; 
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            background-color: #d46000;
+            border-radius: 20px;
+            border: dashed #00dabd 4px
+        }
+        #battle{
+            display: flex;
+            flex-direction: column-reverse;
+            justify-content: space-between;
+            height: 80%;
+            margin: auto; 
+        }
+        #attack-btn{
+            background-color: #da6200;
+            border-radius: 15px;
+            width: 100px;
+            height: 40px;
+            font-size: 1.3em;
+            cursor: pointer;
+        }
+        #debuff-btn{
+            background-color: #da6200;
+            border-radius: 15px;
+            width: 100px;
+            height: 40px;
+            font-size: 1.3em;
+            cursor: pointer;
+        }
+        #Winner{ 
+            font-size: 1.5em;
+            text-align: center;
+            margin-top: 10px;
+        } 
+        #winner-img{
+            width: 200px;
+        }
+        #debuff-btn:hover{
+            background-color: #af5002;
+        }
+        #attack-btn:hover{
+            background-color: #af5002;
+        }
+        #battle-btns{
+            display: flex;
+            gap: 30px;
+            margin-bottom: 50px;
+        }
+        #window-create{  
+            width: 700px;
+            height: 600px;
+            display: flex;    
+            background-color: #1d1d1d; 
+            border-radius: 10px;  
+        }
+        #window-stats{
+            position: relative;
+            width: 600px;
+            height: 550px;
+            display: flex;    
+            background-color: #1d1d1d; 
+            border-radius: 10px;
+        }
+        .stat{
+            width: 60px;
+        }
+        #stats-place{
+            display: flex;
+        }
+        #rating{
+            display: flex;
+        }
+        #rating-pokemon{
+            text-align: center;
+            font-size: 1.2em;
+            margin-top: 10px;
+        }
+        #create-inputs{
+            width: 100%;
+            display: flex;
+            flex-wrap: wrap; 
+            flex-direction: column;
+            align-items: center;
+        } 
+        #create-inputs .create-property:nth-of-type(2){
+            display: flex;   
+            gap: 10px
+        }  
+        #create-inputs .create-property:nth-of-type(5){
+            display: flex;    
+        } 
+        .hidden-file{ 
+            display: none;
+        }
+        #create-inputs .create-property:nth-of-type(2) div{ 
+            max-width: 170px;
+        } 
+        #create-pokemon{
+            position: absolute;
+            bottom: 30px;
+            cursor: pointer;
+            background-color: #ff7300;
+            border-radius: 15px;
+            font-size: 1.2em; 
+            width: 175px;
+            height: 40px;
+        }
+        #upload-file{
+            display: flex;
+            align-items: center;
+            gap:20px;
+        }
+        .upload-btn{
+            font-size: 1.15em;
+            background-color: #ff7300;
+            border-radius: 15px;
+            padding: 5px;
+            width: 150px; 
+            display: flex;
+            justify-content: center;
+        }
+        #image-list{
+            display: flex; 
+            position: absolute;
+            bottom: 0px;
+            gap: 50px;
+            max-width: 100%; 
+            margin: 20px;
+        }
+        .created-stats{
+            display: flex;
+            gap: 10px;
+        }
+        .created-info{
+            display: flex;  
+            gap: 10px;
+        }
+        .created-info p{ 
+            white-space: normal;
+            word-wrap: break-word;
+            overflow-wrap: anywhere;
+        }
+        .created{
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        #create-leyer{ 
+            position: fixed;
+            top: 35%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            display: flex;
+        }
+        #team-information ul{ 
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        #team-information{ 
+            margin-top: 10px;
+            font-size: 1.1em;
+        }
+        .created-pokemon{
+            max-width: 400px;
+            background-color: #ff7300;
+            border-radius: 25px;
+            padding: 10px; 
+
+        }
+        #team-stats-place{ 
+            display: flex;
+            justify-content: space-between;
+            gap: 20px; 
+        }
+        #team-stats-place .team-div{
+            display: flex;
+            flex-direction: column;
+            width: 180px;
+            position: relative; 
+        }
+        #advanced-search{
+            font-size: 1.1em;
+            margin-left: 30px;
+        }
+        #advanced-search:hover{
+            opacity: 0.8;
+        }
+        .team-div{
+            width: 180px;
+            display: flex;
+            flex-direction: column;
+            gap:10px;
+        }
+        #team-image-stats{
+            width: 170px;
+            cursor: pointer;
+        }
+        #friend-image-stats{
+            width: 170px;
+            cursor: pointer;
+            height: 200px;
+            position: relative;
+        }
+        #friend-image-stats:hover{
+            opacity: 0.8;
+        }
+        #team-image-stats:hover{
+            opacity: 0.8;
+        }
+        #team-poke_img{
+            width: 150px;
+            height: 150px; 
+            filter: drop-shadow(0 0 3px rgb(0, 247, 255));
+        }
+        #friend-poke_img{
+            width: 170px;
+            height: 170px; 
+            filter: drop-shadow(0 0 3px rgb(0, 247, 255));
+        }
+        #friend-poke_img:hover{
+            filter: brightness(0.7);
+        }
+        #team-name{
+            position: absolute;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+        #turn{
+            position: absolute;
+            right: 40px;
+            top: 30px;
+        }
+        #turn-number{
+            font-size: 1.3em;
+        }
+        #team-poke_img:hover{
+            filter: brightness(70%);
+        }
+        #team-stats-place .team-div p{
+            text-align: center;
+        }
+        #team-window-stats{
+            background-color: #1d1d1d;
+            border-radius: 20px;
+            height: 600px; 
+            padding: 20px;
+        }
+        .created-types{
+            position: relative;
+        }
+        .second-type{
+            position: absolute;
+            right: 10px; 
+            bottom: 0px;
+        }
+        .image-preview{
+            position: absolute;
+            right: 20px;
+            bottom: 20px;
+            max-height: 190px;
+            max-width: 200px;
+        }
+        .create-property-types{
+            width: 100%;
+            display: flex;  
+            justify-content: center;
+            gap: 100px;
+        } 
+        #create-inputs input{
+            background-color: snow;
+            border-radius: 15px;
+            color: #1d1d1d;
+            margin: 5px;
+            padding: 5px;
+            padding-left: 10px;
+        } 
+        #create-inputs textarea{
+            background-color: snow;
+            border-radius: 15px;
+            color: #1d1d1d;
+            margin: 10px;
+        } 
+        #comment-inputs input{
+            background-color: snow;
+            border-radius: 15px;
+            color: #1d1d1d;
+            margin: 5px;
+            padding: 5px;
+            padding-left: 10px;
+        } 
+        #comment-inputs textarea{
+            background-color: snow;
+            border-radius: 15px;
+            color: #1d1d1d;
+            margin: 10px;
+        } 
+        #image-prewiev{
+            max-width: 175px;
+            max-height: 175px;
+        }
+        #comment-title{
+            width: 300px;
+        }
+        #send-rating{
+            background-color: #ff7300;
+            border-radius: 20px;
+            font-size: 1.2em;
+            width: 150px;
+            height: 40px; 
+            margin-top: 10px;
+            cursor: pointer;
+        }
+        #send-rating:hover{
+            opacity: 0.8;
+        }
+        #rate {
+            width: fit-content;
+            background-color: #ff7300;
+            border-radius: 25px;
+            margin: 20px;
+            padding: 15px;
+
+            max-width: 505px;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        #rate p {
+            min-width: 0; 
+            overflow-wrap: break-word;   
+            word-break: break-word;
+        } 
+        #empty-team{
+            background-color: #3498db;
+            border-radius: 20px;
+            padding: 20px;
+            width: fit-content;
+            margin: auto;
+            text-align: center;
+        }
+        #enemy-team{
+            display: flex;
+        }
+        #friendly-team {
+            display: flex;
+            width: 100%;
+            height: 210px;
+            position: relative;
+            justify-content: center;
+            align-items: center;
+            background-color:#7d00d1;
+            margin-top: 100px;
+            border-top: #ff7300 20px solid;
+            border-bottom: #ff7300 20px solid;
+        }
+        #battle-started{
+            background-color:#1d1d1d;
+            border: #da6200 solid 20px;  
+            border-radius: 20px;
+            height: 900px;
+            width: 600px; 
+            display: flex;
+            flex-direction: column;  
+            justify-content: space-between;
+            align-items: center;
+        } 
+        #h-battle{
+            font-size: 1.4em;
+            margin-top: 20px;
+        }
+        #attakers{
+            position: absolute;
+            bottom: 20%;
+            display: flex;
+            justify-content: center;
+            gap: 50px;
+            width: 900px; 
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+        #supporters{
+            position: absolute;
+            bottom: -10%;
+            display: flex;
+            justify-content: space-between;
+            width: 800px; 
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+        #defenders{
+            position: absolute;
+            bottom: 50%;
+            display: flex;
+            justify-content: space-between;
+            width: 600px; 
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+        #battle-window-stats{
+            background-color:#1d1d1d;
+            border: #da6200 solid 20px;  
+            border-radius: 20px;
+            height: 900px;
+            width: 600px; 
+            display: flex;
+            flex-direction: column;  
+            justify-content: space-between;
+            align-items: center;
+        }
+        .group-rate {
+            display: flex;
+            flex-wrap: wrap; 
+            gap: 20px;
+        }
+        #rate-list{  
+            overflow-y: auto;
+            width: 600px;
+            height: 100%;
+            position: fixed;
+            top: 0px;
+            left: 0px;
+            background-color: #1d1d1d; 
+        }
+        #backgr-rate{
+            position: fixed; 
+            z-index: 100;
+        }
+        #rate-list-btn{
+            background-color: #ff7300;
+            border-radius: 20px;
+            padding: 10px;
+            margin: 20px;
+            cursor: pointer;
+        }
+        #comment-value{
+            max-width: 400px;
+            max-height: 150px;  
+            min-width: 400px;
+            min-height: 150px; 
+            padding: 10px; 
+        }
+        #email{
+            width: 300px;
+        }
+        #rating-btn{
+            width: 30px;
+            height: 75px;
+            border-top-right-radius: 15px;
+            border-bottom-right-radius: 15px;
+            background-color: #1d1d1d;
+            cursor: pointer;
+            font-size: 1.2em;
+            margin: auto;
+        }
+        #form-create{
+            width: 100%;
+        }
+        #rating-form{ 
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center; 
+            position: relative;
+        }
+        #window{  
+            width: 1250px;
+            height: 500px;
+            display: flex; 
+            position: fixed; 
+            justify-content: space-between;
+            top: 50%; 
+            left: 50%;
+            background-color: #1d1d1d;
+            transform: translate(-50%, -50%);
+            border-radius: 10px;
+        }  
+        #stats-left{
+            text-align: center; 
+        }
+        #compare{
+            position: fixed;
+            top: 80px;
+            left: 15px;
+        }
+        #compare-btn{ 
+            background-color: #ff7300;
+            height: 40px;
+            font-size: 1.1em;
+            border-radius: 10px; 
+            padding-left: 10px;
+            padding-right: 10px;
+            cursor: pointer;
+        }
+        #compare-btn:hover{
+            opacity: 0.9;
+        }
+        #image {
+            position: absolute;
+            top: 30%;
+            left: 50%;
+            width: 170px;  
+            border-radius: 10px;  
+
+        }
+        #image-stats { 
+            width: 170px;  
+            border-radius: 10px;  
+
+        }
+        .pok-stats{ 
+            position: relative;
+            width: 400px;
+            border: 2px dashed rgb(255, 115, 0);
+            border-radius: 10px;
+        }
+        #poke_img{
+            width: 170px;
+            height: 150px;
+        }
+        #name{
+            margin: 0;
+            text-align: center; 
+        }
+        #information{ 
+            width: 350px;  
+            padding-top: 10px; 
+            display: flex;
+            flex-direction: column;
+        }
+        #information p{
+            margin: 3px;
+        }
+        #close-com{      
+            position: absolute;
+            right: 0px;
+            color: snow;
+            width: 40px;
+            height: 40px;
+            margin: 0.5em; 
+            font-size: 1.3em; 
+            background-color: rgb(255, 115, 0);
+            border: none;
+            border-radius: 0.5em;  
+            cursor: pointer; 
+        } 
+        #close {      
+            color: snow;
+            width: 50px;
+            height: 50px;
+            position: absolute;
+            right: 0px;
+            top: 0px;
+            margin: 0.5em; 
+            font-size: 1.5em; 
+            background-color: rgb(255, 115, 0);
+            border: none;
+            border-radius: 0.5em;  
+            cursor: pointer; 
+        } 
+        #close-fix {      
+            color: snow;
+            width: 50px;
+            position: sticky;
+            top: 0px;
+            left: 1000px;
+            height: 50px; 
+            margin: 0.5em; 
+            font-size: 1.5em; 
+            background-color: rgb(255, 115, 0);
+            border: none;
+            border-radius: 0.5em;  
+            cursor: pointer; 
+        } 
+        .filters-count{
+            margin-right: 10px;
+        }
+        #toggle-stats{  
+            margin-top: 20px;
+            font-size: 1.2em;   
+            cursor: pointer;
+        }
+        ul{
+            margin:5px;
+        } 
+        #stats{   
+            width: 150px  ;
+            background: #ccc ;
+            height: 10px ;
+            border-Radius: 5px ;
+            overflow: hidden ;
+            margin-top: 3px ;
+        }
+        #counter{
+            height: 100% ;
+            transition: width 0.3s ease; 
+        }
+        #left{
+            color: snow;
+            width: 50px;
+            height: 50px;
+            position: absolute;
+            bottom: 50px;
+            right: 50px; 
+            font-size: 1.5em;
+            background-color: rgb(255, 115, 0);
+            border: none;
+            border-radius: 10px; 
+            cursor: pointer;  
+        }
+        #right{
+            color: snow;
+            width: 50px;
+            height: 50px;
+            position: absolute;
+            bottom: 50px;
+            left: 50px; 
+            font-size: 1.5em; 
+            background-color: rgb(255, 115, 0);
+            border: none;
+            border-radius: 0.5em; 
+            cursor: pointer;  
+        }
+        #right:hover{
+            opacity: 0.8; 
+        }
+        #left:hover{
+            opacity: 0.8; 
+        }
+        #close:hover{
+            opacity: 0.8; 
+        }
+        #loader-table{
+            width: 100%;
+            height: 100%; 
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+        #loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background-color: rgba(0, 0, 0, 0.6);
+            color: white;
+            font-size: 1.2em;
+            z-index: 9999;
+        }
+        #limit{ 
+            position: absolute;
+            top: 50px;
+            right: 0px;
+            left: 0px;
+            color: red;
+        }
+        .spinner { 
+            margin-bottom: 15px;
+            border: 6px solid #ccc;
+            border-top: 6px solid rgb(255, 115, 0);
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        } 
+        #welcome-message{
+            font-size: 5em;
+            color: snow;
+            margin-top: 200px;
+            font-weight: 700;
+            text-align: center;
+        }
+        #welcome-button{ 
+            display: flex;
+            justify-self: center;
+            padding: 25px;
+            padding-top: 10px;
+            padding-bottom: 10Іpx;
+            font-size: 2em;
+            background-color: #17ac67;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        #welcome-button:hover{
+            background-color: #11814d;
+        }
