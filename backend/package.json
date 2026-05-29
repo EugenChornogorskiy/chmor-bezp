@@ -2,9 +2,12 @@
   "name": "backend",
   "version": "1.0.0",
   "main": "backend.js",
+  "type": "module",
   "scripts": {
     "start": "node backend.js",
-    "test": "jest --detectOpenHandles"
+    "test": "jest --detectOpenHandles",
+    "test:unit": "jest tests/unit --coverage",
+    "test:integration": "jest tests/integration --runInBand --coverage"
   },
   "dependencies": {
     "axios": "^1.16.1",
@@ -16,8 +19,8 @@
     "redis": "^5.11.0",
     "uuid": "^9.0.0"
   },
-  "devDependencies": {
-    "jest": "^29.0.0",
+  "devDependencies": { 
+    "jest": "^29.7.0",
     "supertest": "^6.3.3"
   }
 }
