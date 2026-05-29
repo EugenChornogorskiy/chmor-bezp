@@ -1,0 +1,7 @@
+{
+  "instanceName": "backend-instance",
+  "timeout": 30000,
+  "maxRequests": 1000,
+  "logLevel": "info",
+  "cacheTTL": 10
+}

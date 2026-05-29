@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    nginx: nginx
+  name: nginx
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      nginx: nginx
+  template:
+    metadata:
+      labels:
+        nginx: nginx 
+    spec: 
+      containers:
+        - name: nginx
+          image: eugenchornogorskiy/product-frontend:v9
+          resources:
+            limits:
+              cpu: "500m"
+              memory: "256Mi"
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+          volumeMounts:
+            - mountPath: /etc/nginx/nginx.conf 
+              name: nginx-conf
+              subPath: nginx.conf  
+          livenessProbe: 
+            exec:
+              command:
+                - curl
+                - -f 
+                - http://localhost:80
+            failureThreshold: 5
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            timeoutSeconds: 5
+      volumes:
+        - name: nginx-conf
+          configMap:
+            items:
+              - key: nginx.conf
+                path: nginx.conf
+            name: nginx-conf 
+      restartPolicy: Always
+        
+

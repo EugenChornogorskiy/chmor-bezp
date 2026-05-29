@@ -1,0 +1,117 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api
+  labels:
+    api: api
+spec:
+  replicas: 5
+  selector:
+    matchLabels:
+      api: api
+  template:
+    metadata:
+      labels:
+        api: api
+    spec:
+      terminationGracePeriodSeconds: 30
+      containers:
+        - name: api   
+          image: eugenchornogorskiy/product-backend:v9
+          resources:
+            limits:
+              cpu: "1000m"
+              memory: "512Mi"
+            requests:
+              cpu: "200m"
+              memory: "256Mi"
+          volumeMounts:
+            - mountPath: /app/app.config.json
+              name: app-config
+              subPath: app.config.json
+            - mountPath: /app/pokemon.json
+              name: pokemons
+              subPath: pokemon.json
+          livenessProbe: 
+            exec:
+              command:
+                - wget
+                - -qO-
+                - http://localhost:3000/health
+            failureThreshold: 5
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            timeoutSeconds: 5
+          env:
+            - name: BACKEND_PORT
+              valueFrom:
+                configMapKeyRef:
+                  key: BACKEND_PORT
+                  name: env-common
+            - name: INSTANCE_ID
+              value: api
+            - name: LOG_LEVEL
+              value: info
+            - name: PG_HOST
+              valueFrom:
+                configMapKeyRef:
+                  key: PG_HOST
+                  name: env-common
+            - name: POSTGRES_DB
+              valueFrom:
+                configMapKeyRef:
+                  key: POSTGRES_DB
+                  name: env-common
+            - name: REDIS_URL
+              valueFrom:
+                configMapKeyRef:
+                  key: REDIS_URL
+                  name: env-common
+            - name: PG_USER
+              valueFrom:
+                secretKeyRef:
+                  key: PG_USER
+                  name: pg-user
+            - name: PG_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  key: PG_PASSWORD
+                  name: pg-password
+            - name: CLIENT_ID
+              valueFrom:
+                configMapKeyRef:
+                  key: CLIENT_ID
+                  name: env-common
+            - name: CLIENT_SECRET
+              valueFrom:
+                configMapKeyRef:
+                  key: CLIENT_SECRET
+                  name: env-common
+            - name: REDIRECT_URI
+              valueFrom:
+                configMapKeyRef:
+                  key: REDIRECT_URI
+                  name: env-common 
+            - name: SLUG
+              valueFrom:
+                configMapKeyRef:
+                  key: SLUG
+                  name: env-common 
+            - name: AUTH_URL
+              valueFrom:
+                configMapKeyRef:
+                  key: AUTH_URL
+                  name: env-common  
+      volumes:
+        - name: app-config
+          configMap:
+            items:
+              - key: app.config.json
+                path: app.config.json
+            name: app-config 
+        - name: pokemons
+          configMap:
+            items:
+              - key: pokemon.json
+                path: pokemon.json
+            name: pokemons

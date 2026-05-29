@@ -1,0 +1,59 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata: 
+  labels:
+    postgres: postgres
+  name: postgres
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      postgres: postgres
+  strategy:
+    type: Recreate
+  template:
+    metadata: 
+      labels:
+        postgres: postgres
+    spec:
+      containers:
+        - env:
+            - name: POSTGRES_DB
+              value: products
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef: 
+                  key: PG_PASSWORD
+                  name: pg-password
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef: 
+                  key: PG_USER
+                  name: pg-user
+          image: postgres:15
+          resources:
+            limits:
+              cpu: "1000m"
+              memory: "1024Mi"
+            requests:
+              cpu: "200m"
+              memory: "512Mi"
+          livenessProbe:
+            exec:
+              command:
+                - sh
+                - -c
+                - pg_isready -U $(POSTGRES_USER)
+            failureThreshold: 5
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            timeoutSeconds: 5
+          name: postgres
+          volumeMounts: 
+            - mountPath: /var/lib/postgresql/data
+              name: postgres-data
+      restartPolicy: Always
+      volumes: 
+        - name: postgres-data
+          persistentVolumeClaim:
+            claimName: postgres-data

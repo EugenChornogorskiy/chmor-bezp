@@ -1,0 +1,19 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: auth-pg-network-policy
+spec:
+  podSelector:
+    matchLabels:
+      auth-postgres: auth-postgres
+  policyTypes: 
+    - Ingress
+  ingress:
+    - from:
+      - podSelector:
+          matchLabels:
+            auth: authentik
+      ports:
+        - protocol: TCP
+          port: 5432
+

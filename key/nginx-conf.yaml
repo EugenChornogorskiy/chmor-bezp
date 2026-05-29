@@ -1,0 +1,41 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nginx-conf
+  labels:
+    nginx: nginx
+data:
+  nginx.conf: |
+    events {}
+
+    http {
+      include /etc/nginx/mime.types;
+      default_type application/octet-stream; 
+      
+      proxy_cache_path /tmp/nginx_cache levels=1:2 keys_zone=cache_zone:10m;
+       
+      server {
+        listen 80;
+
+
+        location = /api/stats {
+          proxy_pass http://api/stats;
+    
+          proxy_cache cache_zone;
+          proxy_cache_valid 200 30s;
+
+          add_header X-Cache-Status $upstream_cache_status;
+        } 
+        location /api/ {
+          proxy_pass http://api/;
+        }
+        location /authentik/ {
+          proxy_pass http://authentik/;
+        }
+        location / {
+          root /usr/share/nginx/html;
+          index index.html;
+          try_files $uri $uri.html $uri/ /index.html;
+        }
+      }
+    }

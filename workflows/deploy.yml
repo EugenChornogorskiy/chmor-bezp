@@ -1,0 +1,204 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+
+env:
+  REGISTRY: ghcr.io  
+  IMAGE_NAME_BACKEND: ${{ github.repository }}-backend
+  IMAGE_NAME_FRONTEND: ${{ github.repository }}-frontend
+  K8S_NAMESPACE: default
+
+jobs:
+  test:
+    name: Test Application
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm ci 
+
+      - name: Run unit tests
+        run: npm test 
+
+      - name: Validate Kubernetes manifests
+        uses: actions/checkout@v4
+      - name: Kubeval validation
+        uses: instrumenta/kubeval-action@v1
+        with:
+          files: .
+          strict: true
+
+  build:
+    name: Build and Push Images
+    runs-on: ubuntu-latest
+    needs: test
+    if: github.event_name == 'push'
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Log in to Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata for Backend
+        id: meta-backend
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME_BACKEND }}
+          tags: |
+            type=sha,prefix={{date 'YYYYMMDD'}}-.
+            type=ref,event=branch
+            type=raw,value=latest,enable={{is_default_branch}}
+
+      - name: Build and push Backend
+        uses: docker/build-push-action@v5
+        with:
+          context: ./backend
+          push: true
+          tags: ${{ steps.meta-backend.outputs.tags }}
+          labels: ${{ steps.meta-backend.outputs.labels }}
+
+      - name: Extract metadata for Frontend
+        id: meta-frontend
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME_FRONTEND }}
+          tags: |
+            type=sha,prefix={{date 'YYYYMMDD'}}-.
+            type=ref,event=branch
+            type=raw,value=latest,enable={{is_default_branch}}
+
+      - name: Build and push Frontend
+        uses: docker/build-push-action@v5
+        with:
+          context: ./frontend
+          push: true
+          tags: ${{ steps.meta-frontend.outputs.tags }}
+          labels: ${{ steps.meta-frontend.outputs.labels }}
+
+  deploy:
+    name: Deploy to Kubernetes
+    runs-on: ubuntu-latest
+    needs: build
+    if: github.ref == 'refs/heads/main'
+    environment: production
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up kubeconfig
+        uses: azure/setup-kubectl@v4
+        with:
+          version: 'latest'
+
+      - name: Configure kubectl
+        run: |
+          mkdir -p $HOME/.kube
+          echo "${{ secrets.KUBE_CONFIG }}" | base64 --decode > $HOME/.kube/config
+
+      - name: Update image tags in manifests
+        run: |
+          SHA_TAG=$(git rev-parse --short=7 HEAD)
+          DATE_TAG=$(date +'%Y%m%d')
+          FULL_TAG="${DATE_TAG}-${SHA_TAG}"  
+          
+          sed -i "s|image: eugenchornogorskiy/product-backend:v9|image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME_BACKEND }}:${FULL_TAG}|g" api-deployment.yaml
+           
+          sed -i "s|image: eugenchornogorskiy/product-frontend:v9|image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME_FRONTEND }}:${FULL_TAG}|g" nginx-deployment.yaml
+      - name: Create secrets (from GitHub Secrets)
+        run: |
+          kubectl create secret generic pg-user --from-literal=PG_USER=${{ secrets.PG_USER }} --dry-run=client -o yaml | kubectl apply -f -
+          kubectl create secret generic pg-password --from-literal=PG_PASSWORD=${{ secrets.PG_PASSWORD }} --dry-run=client -o yaml | kubectl apply -f -
+          kubectl create secret generic auth-pg-user --from-literal=AUTH_PG_USER=${{ secrets.AUTH_PG_USER }} --dry-run=client -o yaml | kubectl apply -f -
+          kubectl create secret generic auth-pg-password --from-literal=AUTH_PG_PASSWORD=${{ secrets.AUTH_PG_PASSWORD }} --dry-run=client -o yaml | kubectl apply -f -
+          kubectl create secret generic auth-secret-key --from-literal=AUTHENTIK_SECRET_KEY=${{ secrets.AUTHENTIK_SECRET_KEY }} --dry-run=client -o yaml | kubectl apply -f -
+
+      - name: Create ConfigMaps
+        run: |
+          kubectl create configmap env-common --from-file=env.common.json --dry-run=client -o yaml | kubectl apply -f -
+          kubectl create configmap pokemons --from-file=pokemon.json --dry-run=client -o yaml | kubectl apply -f -
+
+      - name: Apply all Kubernetes manifests
+        run: |
+          # Apply in order
+          kubectl apply -f app-config-configmap.yaml
+          kubectl apply -f nginx-conf.yaml
+          kubectl apply -f postgres-data-pvc.yaml
+          kubectl apply -f authorization-pg-data-pvc.yaml
+          kubectl apply -f redis-pvc.yaml
+          
+          kubectl apply -f postgres-deployment.yaml
+          kubectl apply -f postgres-service.yaml
+          kubectl apply -f authorization-pg-deployment.yaml
+          kubectl apply -f authorization-pg-service.yaml
+          kubectl apply -f redis-deployment.yaml
+          kubectl apply -f redis-service.yaml
+          
+          kubectl apply -f postgres-network.yaml
+          kubectl apply -f redis-network.yaml
+          kubectl apply -f authorization-pg-network.yaml
+          kubectl apply -f authorization-network.yaml
+          kubectl apply -f api-network.yaml
+          kubectl apply -f nginx-network.yaml
+          
+          kubectl apply -f authorization-deployment.yml
+          kubectl apply -f authorization-service.yaml
+          kubectl apply -f api-deployment.yaml
+          kubectl apply -f api-service.yaml
+          kubectl apply -f nginx-deployment.yaml
+          kubectl apply -f nginx-service.yaml
+
+      - name: Wait for rollouts
+        run: |
+          kubectl rollout status deployment/api --timeout=300s
+          kubectl rollout status deployment/nginx --timeout=300s
+          kubectl rollout status deployment/postgres --timeout=300s
+          kubectl rollout status deployment/redis --timeout=300s
+          kubectl rollout status deployment/authentik --timeout=300s
+          kubectl rollout status deployment/auth-postgres --timeout=300s
+
+      - name: Verify deployment
+        run: |
+          echo "=== Pod Status ==="
+          kubectl get pods
+          echo "=== Services ==="
+          kubectl get svc
+          echo "=== Network Policies ==="
+          kubectl get networkpolicies
+
+  rollback:
+    name: Rollback on Failure
+    runs-on: ubuntu-latest
+    needs: deploy
+    if: failure()
+    steps:
+      - name: Configure kubectl
+        run: |
+          mkdir -p $HOME/.kube
+          echo "${{ secrets.KUBE_CONFIG }}" | base64 --decode > $HOME/.kube/config
+
+      - name: Rollback deployments
+        run: |
+          kubectl rollout undo deployment/api
+          kubectl rollout undo deployment/nginx
+          kubectl rollout undo deployment/authentik

@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata: 
+  labels:
+    redis: redis
+  name: redis
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      redis: redis
+  strategy:
+    type: Recreate
+  template:
+    metadata: 
+      labels:
+        redis: redis
+    spec:
+      containers:
+        - args:
+            - redis-server
+            - --appendonly
+            - "yes"
+          image: redis:7-alpine
+          resources:
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
+            requests:
+              cpu: "100m"
+              memory: "256Mi"
+          livenessProbe:
+            exec:
+              command:
+                - redis-cli
+                - ping
+            failureThreshold: 5
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            timeoutSeconds: 5
+          name: redis
+          volumeMounts:
+            - mountPath: /data
+              name: redis-data
+      restartPolicy: Always
+      volumes:
+        - name: redis-data
+          persistentVolumeClaim:
+            claimName: redis-data

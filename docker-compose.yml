@@ -1,0 +1,188 @@
+version: '3'
+
+networks:
+  proxy-net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/24
+          gateway: 172.20.0.1
+  app-net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.21.0.0/24
+          gateway: 172.21.0.1
+  db-net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.22.0.0/24
+          gateway: 172.22.0.1
+
+volumes:
+  postgres-data:
+    name: postgres-data
+  redis-data:
+    name: redis-data
+ 
+secrets:
+  db_user:
+    file: ./secrets/db_user.txt
+  db_password:
+    file: ./secrets/db_password.txt
+ 
+configs:
+  nginx_config:
+    file: ./frontend/nginx.conf
+  app_config:
+    file: ./backend/app.config.json
+
+services: 
+  postgres:
+    image: postgres:15
+    container_name: postgres
+    networks:
+      db-net:
+        ipv4_address: 172.22.0.10
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    secrets:
+      - db_user
+      - db_password
+    environment:
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER_FILE=/run/secrets/db_user
+      - POSTGRES_PASSWORD_FILE=/run/secrets/db_password
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    restart: unless-stopped
+ 
+  redis:
+    image: redis:7-alpine
+    container_name: redis
+    networks:
+      app-net:
+        ipv4_address: 172.21.0.10
+    volumes:
+      - redis-data:/data
+    command: redis-server --appendonly yes
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    restart: unless-stopped 
+ 
+  api:
+    image: eugenchornogorskiy/product-backend:v6
+    container_name: api
+    networks:
+      app-net:
+        ipv4_address: 172.21.0.21
+      db-net:
+        ipv4_address: 172.22.0.21
+      proxy-net:
+        ipv4_address: 172.20.0.21
+    secrets:
+      - db_user
+      - db_password
+    configs:
+      - source: app_config
+        target: /app/app.config.json
+    environment:
+      - BACKEND_PORT=3000
+      - POSTGRES_DB=${POSTGRES_DB}
+      - REDIS_URL=${REDIS_URL}
+      - PG_HOST=${PG_HOST}
+      - INSTANCE_ID=api
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+    restart: unless-stopped
+
+  postgres-au:
+    image: postgres:16
+    networks:
+      proxy-net:
+        ipv4_address: 172.20.0.23
+      db-net:
+        ipv4_address: 172.22.0.23
+      app-net:
+        ipv4_address: 172.21.0.23
+    environment:
+      POSTGRES_USER: authentik
+      POSTGRES_PASSWORD: authentik
+      POSTGRES_DB: authentik
+
+  authentik:
+    image: ghcr.io/goauthentik/server:latest
+    command: server
+    networks:
+      proxy-net:
+        ipv4_address: 172.20.0.22
+      db-net:
+        ipv4_address: 172.22.0.22
+      app-net:
+        ipv4_address: 172.21.0.22
+    environment:
+      AUTHENTIK_SECRET_KEY: "random-long-string"
+      AUTHENTIK_REDIS__HOST: redis 
+      AUTHENTIK_POSTGRESQL__HOST: postgres-au
+      AUTHENTIK_POSTGRESQL__USER: authentik
+      AUTHENTIK_POSTGRESQL__PASSWORD: authentik
+      AUTHENTIK_POSTGRESQL__NAME: authentik
+    ports:
+      - "9000:9000" 
+  worker:
+    image: ghcr.io/goauthentik/server:latest
+    command: worker
+    networks:
+      proxy-net:
+        ipv4_address: 172.20.0.24
+      db-net:
+        ipv4_address: 172.22.0.24
+      app-net:
+        ipv4_address: 172.21.0.24
+    environment:
+      AUTHENTIK_SECRET_KEY: "random-long-string"
+      AUTHENTIK_REDIS__HOST: redis
+      AUTHENTIK_POSTGRESQL__HOST: postgres-au
+      AUTHENTIK_POSTGRESQL__USER: authentik
+      AUTHENTIK_POSTGRESQL__PASSWORD: authentik
+      AUTHENTIK_POSTGRESQL__NAME: authentik
+  nginx: 
+    image: eugenchornogorskiy/product-frontend:v6
+    container_name: frontend
+    networks:
+      proxy-net:
+        ipv4_address: 172.20.0.10
+    configs:
+      - source: nginx_config
+        target: /etc/nginx/nginx.conf
+    ports:
+      - "80:80"
+    depends_on:
+      api:
+        condition: service_started 
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:80"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    restart: unless-stopped
+  

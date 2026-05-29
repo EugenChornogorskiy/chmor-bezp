@@ -1,0 +1,70 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: authentik
+  labels:
+    auth: authentik
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      auth: authentik
+  template:
+    metadata:
+      labels:
+        auth: authentik
+    spec:
+      containers: 
+        - name: authentik-server
+          image: ghcr.io/goauthentik/server:latest  
+          args: ["worker"] 
+          env:
+            - name: AUTHENTIK_POSTGRESQL__HOST
+              value: auth-postgres
+            - name: AUTHENTIK_POSTGRESQL__USER
+              valueFrom:
+                secretKeyRef:
+                  key: AUTH_PG_USER
+                  name: auth-pg-user
+            - name: AUTHENTIK_POSTGRESQL__PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  key: AUTH_PG_PASSWORD
+                  name: auth-pg-password 
+            - name: AUTHENTIK_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  key: AUTHENTIK_SECRET_KEY
+                  name: auth-secret-key
+            - name: AUTHENTIK_REDIS__HOST
+              value: redis 
+            - name:  AUTHENTIK_POSTGRESQL__NAME
+              value: auth
+        - name: authentik-worker
+          image: ghcr.io/goauthentik/server:latest  
+          args: ["server"]
+          name: authentik-worker
+          env:
+            - name: AUTHENTIK_POSTGRESQL__HOST
+              value: auth-postgres
+            - name: AUTHENTIK_POSTGRESQL__USER
+              valueFrom:
+                secretKeyRef:
+                  key: AUTH_PG_USER
+                  name: auth-pg-user
+            - name: AUTHENTIK_POSTGRESQL__PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  key: AUTH_PG_PASSWORD
+                  name: auth-pg-password 
+            - name: AUTHENTIK_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  key: AUTHENTIK_SECRET_KEY
+                  name: auth-secret-key
+            - name: AUTHENTIK_REDIS__HOST
+              value: redis 
+            - name:  AUTHENTIK_POSTGRESQL__NAME
+              value: auth
+      restartPolicy: Always
+

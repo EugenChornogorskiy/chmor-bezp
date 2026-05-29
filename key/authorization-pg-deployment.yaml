@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata: 
+  labels:
+    auth-postgres: auth-postgres
+  name: auth-postgres
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      auth-postgres: auth-postgres
+  strategy:
+    type: Recreate
+  template:
+    metadata: 
+      labels:
+        auth-postgres: auth-postgres
+    spec:
+      containers:
+        - env:
+            - name: POSTGRES_DB
+              value: auth
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef: 
+                  key: AUTH_PG_PASSWORD
+                  name: auth-pg-password
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef: 
+                  key: AUTH_PG_USER
+                  name: auth-pg-user
+          image: postgres:15
+          livenessProbe:
+            exec:
+              command:
+                - sh
+                - -c
+                - pg_isready -U $(POSTGRES_USER)
+            failureThreshold: 5
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            timeoutSeconds: 5
+          name: auth-postgres
+          volumeMounts: 
+            - mountPath: /var/lib/postgresql/data
+              name: auth-postgres-data
+      restartPolicy: Always
+      volumes: 
+        - name: auth-postgres-data
+          persistentVolumeClaim:
+            claimName: auth-postgres-data
