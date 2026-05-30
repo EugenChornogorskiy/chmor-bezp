@@ -224,7 +224,7 @@ jobs:
 
       - name: Wait for rollouts
         run: |
-          kubectl describe pod -l app=api
+          kubectl describe pod -l api=api
           kubectl rollout status deployment/api --timeout=300s
           kubectl rollout status deployment/nginx --timeout=300s
           kubectl rollout status deployment/postgres --timeout=300s
