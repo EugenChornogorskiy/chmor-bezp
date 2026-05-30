@@ -39,3 +39,6 @@ kubectl apply -f nginx-deployment.yaml
 kubectl apply -f nginx-service.yaml
 Start-Job { kubectl port-forward service/nginx 80:80 }
 Start-Job { kubectl port-forward service/authentik 9000:9000 }
+
+
+curl http://localhost:3000/metrics -UseBasicParsing | Select-Object -ExpandProperty Content | Select-String "http_requests"

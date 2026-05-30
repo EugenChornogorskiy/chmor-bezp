@@ -17,6 +17,10 @@ spec:
       containers: 
         - name: authentik-server
           image: ghcr.io/goauthentik/server:latest  
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 1001
+            allowPrivilegeEscalation: false
           args: ["worker"] 
           env:
             - name: AUTHENTIK_POSTGRESQL__HOST
@@ -42,6 +46,10 @@ spec:
               value: auth
         - name: authentik-worker
           image: ghcr.io/goauthentik/server:latest  
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 1001
+            allowPrivilegeEscalation: false
           args: ["server"]
           name: authentik-worker
           env:

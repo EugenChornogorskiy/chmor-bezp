@@ -16,7 +16,11 @@ spec:
     spec:  
       containers:
         - name: nginx
-          image: ghcr.io/eugenchornogorskiy/chmor-bezp/frontend:latest 
+          image: ghcr.io/eugenchornogorskiy/chmor-bezp/frontend:latest
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 101
+            allowPrivilegeEscalation: false
           resources:
             limits:
               cpu: "500m"

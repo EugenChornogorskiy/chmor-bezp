@@ -19,9 +19,20 @@ spec:
         api: api
     spec:
       terminationGracePeriodSeconds: 30 
+      initContainers:
+        - name: wait-for-postgres
+          image: postgres:15
+          command: ["sh", "-c", "until pg_isready -h postgres; do sleep 2; done"]
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 1000
       containers:
         - name: api   
-          image: ghcr.io/eugenchornogorskiy/chmor-bezp/backend:latest 
+          image: ghcr.io/eugenchornogorskiy/chmor-bezp/backend:latest
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 1001
+            allowPrivilegeEscalation: false
           resources:
             limits:
               cpu: "1000m"

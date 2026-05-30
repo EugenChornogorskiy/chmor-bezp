@@ -24,6 +24,9 @@ spec:
             - --appendonly
             - "yes"
           image: redis:7-alpine
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 1000
           resources:
             limits:
               cpu: "500m"

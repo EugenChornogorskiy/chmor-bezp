@@ -31,6 +31,9 @@ spec:
                   key: AUTH_PG_USER
                   name: auth-pg-user
           image: postgres:15
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 999
           livenessProbe:
             exec:
               command:
