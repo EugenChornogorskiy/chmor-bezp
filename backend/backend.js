@@ -1,14 +1,16 @@
 import express from 'express';
 import { v4 as uuidv4 } from 'uuid';
 import pkg from 'pg';
-const { Pool } = pkg;
+import client from 'prom-client'; 
 import { createClient } from 'redis';
 import fs from 'fs';
 import jwt from "jsonwebtoken";
 import jwksClient from "jwks-rsa";
 import axios from "axios";
 
+const { Pool } = pkg;
 const app = express();
+const register = new client.Registry();
 const PORT = process.env.BACKEND_PORT;
 const startTime = Date.now();
 const AUTH_URL = process.env.AUTH_URL;
@@ -16,7 +18,38 @@ const CLIENT_ID = process.env.CLIENT_ID;
 const CLIENT_SECRET = process.env.CLIENT_SECRET;
 const REDIRECT_URI = process.env.REDIRECT_URI;
 const SLUG = process.env.SLUG;
+
+client.collectDefaultMetrics({ register });
+
+const httpRequestsTotal = new client.Counter({
+  name: 'http_requests_total',
+  help: 'Total number of HTTP requests',
+  labelNames: ['method', 'route', 'status'],
+  registers: [register],
+});
+
+const httpRequestDuration = new client.Histogram({
+  name: 'http_request_duration_seconds',
+  help: 'Duration of HTTP requests in seconds',
+  labelNames: ['method', 'route'],
+  buckets: [0.01, 0.05, 0.1, 0.5, 1, 2, 5],
+  registers: [register],
+});
+
 app.use(express.json({ limit: '10mb' }));
+
+app.use((req, res, next) => {
+  const end = httpRequestDuration.startTimer();
+  res.on('finish', () => {
+    httpRequestsTotal.inc({
+      method: req.method,
+      route: req.route?.path || req.path,
+      status: res.statusCode,
+    });
+    end({ method: req.method, route: req.route?.path || req.path });
+  });
+  next();
+});
 
 let requestCount = 0;
 app.use((req, res, next) => {
@@ -99,7 +132,11 @@ const redisClient = createClient({
 const appConfig = {  instanceName: 'default', timeout: 30000, limit: 100, cacheTTL: 10 }; 
 const instanceId = process.env.INSTANCE_ID || appConfig.instanceName || "default-instance";
  
- 
+app.get('/metrics', async (req, res) => {
+  res.set('Content-Type', register.contentType);
+  res.end(await register.metrics());
+}); 
+
 app.get('/items', auth, async (req, res) => {
   const result = await pgPool.query('SELECT data FROM items');
 

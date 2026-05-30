@@ -11,6 +11,10 @@ spec:
       api: api
   template:
     metadata:
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "3000"
+        prometheus.io/path: "/metrics"
       labels:
         api: api
     spec:
