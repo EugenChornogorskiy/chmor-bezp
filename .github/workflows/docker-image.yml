@@ -224,6 +224,13 @@ jobs:
 
       - name: Wait for rollouts
         run: |
+          kubectl get pods
+          kubectl get deployments
+          kubectl describe deployment api
+          kubectl get pods -l app=api
+          kubectl describe pod -l app=api
+          kubectl logs -l app=api --tail=200
+          kubectl get events --sort-by=.metadata.creationTimestamp
           kubectl rollout status deployment/api --timeout=300s
           kubectl rollout status deployment/nginx --timeout=300s
           kubectl rollout status deployment/postgres --timeout=300s
