@@ -180,8 +180,8 @@ jobs:
 
       - name: Update images in manifests
         run: |
-          sed -i "s|image: eugenchornogorskiy/product-backend:v9|image: ${{ env.IMAGE_NAME_BACKEND }}:${{ steps.vars.outputs.TAG }}|g" api-deployment.yaml
-          sed -i "s|image: eugenchornogorskiy/product-frontend:v9|image: ${{ env.IMAGE_NAME_FRONTEND }}:${{ steps.vars.outputs.TAG }}|g" nginx-deployment.yaml
+          sed -i "s|image: ghcr.io/eugenchornogorskiy/chmor-bezp/backend:latest|image: ${{ env.IMAGE_NAME_BACKEND }}:${{ steps.vars.outputs.TAG }}|g" api-deployment.yaml
+          sed -i "s|image: ghcr.io/eugenchornogorskiy/chmor-bezp/frontend:latest|image: ${{ env.IMAGE_NAME_FRONTEND }}:${{ steps.vars.outputs.TAG }}|g" nginx-deployment.yaml
 
       - name: Create secrets
         run: |
