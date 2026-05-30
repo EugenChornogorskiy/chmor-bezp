@@ -1,7 +1,7 @@
 import express from 'express';
 import { v4 as uuidv4 } from 'uuid';
 import pkg from 'pg';
-import client from 'prom-client'; 
+import clientProm from 'prom-client'; 
 import { createClient } from 'redis';
 import fs from 'fs';
 import jwt from "jsonwebtoken";
@@ -10,7 +10,7 @@ import axios from "axios";
 
 const { Pool } = pkg;
 const app = express();
-const register = new client.Registry();
+const register = new clientProm.Registry();
 const PORT = process.env.BACKEND_PORT;
 const startTime = Date.now();
 const AUTH_URL = process.env.AUTH_URL;
@@ -19,16 +19,16 @@ const CLIENT_SECRET = process.env.CLIENT_SECRET;
 const REDIRECT_URI = process.env.REDIRECT_URI;
 const SLUG = process.env.SLUG;
 
-client.collectDefaultMetrics({ register });
+clientProm.collectDefaultMetrics({ register });
 
-const httpRequestsTotal = new client.Counter({
+const httpRequestsTotal = new clientProm.Counter({
   name: 'http_requests_total',
   help: 'Total number of HTTP requests',
   labelNames: ['method', 'route', 'status'],
   registers: [register],
 });
 
-const httpRequestDuration = new client.Histogram({
+const httpRequestDuration = new clientProm.Histogram({
   name: 'http_request_duration_seconds',
   help: 'Duration of HTTP requests in seconds',
   labelNames: ['method', 'route'],
