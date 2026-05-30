@@ -13,12 +13,10 @@ spec:
     metadata:
       labels:
         nginx: nginx 
-    spec: 
-      imagePullSecrets:
-      - name: ghcr-secret
+    spec:  
       containers:
         - name: nginx
-          image: ghcr.io/eugenchornogorskiy/chmor-bezp/frontend:latest
+          image: ghcr.io/eugenchornogorskiy/chmor-bezp/frontend:latest 
           resources:
             limits:
               cpu: "500m"

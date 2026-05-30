@@ -5,7 +5,7 @@ kubectl create secret generic auth-pg-user --from-literal=AUTH_PG_USER=postgres
 kubectl create secret generic auth-pg-password --from-literal=AUTH_PG_PASSWORD=postgres
  
 kubectl create secret generic auth-secret-key --from-literal=AUTHENTIK_SECRET_KEY=secret
-kubectl create configmap env-common --from-file=.env.common
+kubectl create configmap env-common --from-env=env.common.json
 kubectl create configmap pokemons --from-file=pokemon.json
 kubectl apply -f nginx-conf.yaml
 kubectl apply -f app-config-configmap.yaml

@@ -13,9 +13,7 @@ spec:
     metadata:
       labels:
         auth: authentik
-    spec:
-      imagePullSecrets:
-      - name: ghcr-secret
+    spec: 
       containers: 
         - name: authentik-server
           image: ghcr.io/goauthentik/server:latest  

@@ -184,12 +184,7 @@ jobs:
           sed -i "s|image: ghcr.io/eugenchornogorskiy/chmor-bezp/frontend:latest|image: ${{ env.IMAGE_NAME_FRONTEND }}:${{ steps.vars.outputs.TAG }}|g" nginx-deployment.yaml
 
       - name: Create secrets
-        run: |
-          kubectl create secret docker-registry ghcr-secret \
-            --docker-server=ghcr.io \
-            --docker-username=${{ github.actor }} \
-            --docker-password=${{ secrets.GITHUB_TOKEN }} \
-            --dry-run=client -o yaml | kubectl apply -f -
+        run: | 
           kubectl create secret generic pg-user --from-literal=PG_USER=${{ secrets.PG_USER }} --dry-run=client -o yaml | kubectl apply -f - || true
           kubectl create secret generic pg-password --from-literal=PG_PASSWORD=${{ secrets.PG_PASSWORD }} --dry-run=client -o yaml | kubectl apply -f - || true
           kubectl create secret generic auth-pg-user --from-literal=AUTH_PG_USER=${{ secrets.AUTH_PG_USER }} --dry-run=client -o yaml | kubectl apply -f - || true
@@ -198,7 +193,7 @@ jobs:
 
       - name: Create configmaps
         run: |
-          kubectl create configmap env-common --from-file=env.common.json --dry-run=client -o yaml | kubectl apply -f - || true
+          kubectl create configmap env-common --from-env-file=env.common.json --dry-run=client -o yaml | kubectl apply -f - || true
           kubectl create configmap pokemons --from-file=pokemon.json --dry-run=client -o yaml | kubectl apply -f - || true
 
       - name: Apply Kubernetes manifests
