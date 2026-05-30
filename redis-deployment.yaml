@@ -16,6 +16,8 @@ spec:
       labels:
         redis: redis
     spec:
+      imagePullSecrets:
+      - name: ghcr-secret
       containers:
         - args:
             - redis-server

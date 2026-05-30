@@ -16,6 +16,8 @@ spec:
       labels:
         auth-postgres: auth-postgres
     spec:
+      imagePullSecrets:
+      - name: ghcr-secret
       containers:
         - env:
             - name: POSTGRES_DB

@@ -15,9 +15,11 @@ spec:
         api: api
     spec:
       terminationGracePeriodSeconds: 30
+      imagePullSecrets:
+      - name: ghcr-secret
       containers:
         - name: api   
-          image: eugenchornogorskiy/product-backend:v9
+          image: ghcr.io/eugenchornogorskiy/chmor-bezp/backend:latest
           resources:
             limits:
               cpu: "1000m"
