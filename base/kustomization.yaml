@@ -26,3 +26,20 @@ resources:
   - authorization-pg-network.yaml
   - authorization-pg-data-pvc.yaml
   - app-config-configmap.yaml 
+  
+secretGenerator:
+  - name: pg-user
+    literals:
+      - PG_USER=placeholder
+  - name: pg-password
+    literals:
+      - PG_PASSWORD=placeholder
+  - name: auth-pg-user
+    literals:
+      - AUTH_PG_USER=placeholder
+  - name: auth-pg-password
+    literals:
+      - AUTH_PG_PASSWORD=placeholder
+  - name: auth-secret-key
+    literals:
+      - AUTHENTIK_SECRET_KEY=placeholder
