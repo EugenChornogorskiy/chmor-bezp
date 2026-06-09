@@ -180,6 +180,7 @@ jobs:
 
       - name: Apply Kubernetes manifests
         run: |
+          kubectl kustomize overlays/prod
           kubectl apply -k overlays/prod
 
       - name: Wait for rollouts

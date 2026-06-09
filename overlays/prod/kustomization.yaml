@@ -21,6 +21,7 @@ configMapGenerator:
   - name: pokemons
     files:
       - pokemon.json 
+    behavior: replace
 
 secretGenerator:
   - name: pg-user
