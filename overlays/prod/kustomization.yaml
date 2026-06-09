@@ -17,12 +17,10 @@ configMapGenerator:
       - CLIENT_SECRET=secret
       - REDIRECT_URI=http://localhost/callback
       - SLUG=my-app
-      - AUTH_URL=http://authentik:9000
-    behavior: replace
+      - AUTH_URL=http://authentik:9000 
   - name: pokemons
     files:
-      - ../../base/pokemon.json
-    behavior: replace
+      - ../../base/pokemon.json 
 
 secretGenerator:
   - name: pg-user
