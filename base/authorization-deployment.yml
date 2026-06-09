@@ -50,8 +50,7 @@ spec:
             runAsNonRoot: true
             runAsUser: 1001
             allowPrivilegeEscalation: false
-          args: ["server"]
-          name: authentik-worker
+          args: ["server"] 
           env:
             - name: AUTHENTIK_POSTGRESQL__HOST
               value: auth-postgres
