@@ -21,7 +21,7 @@ configMapGenerator:
     behavior: replace
   - name: pokemons
     files:
-      - ../../pokemon.json
+      - ../../base/pokemon.json
     behavior: replace
 
 secretGenerator:
