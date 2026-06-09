@@ -1,0 +1,47 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: chmor-prod
+
+resources:
+  - ../../base 
+
+configMapGenerator:
+  - name: env-common
+    literals:
+      - BACKEND_PORT=3000
+      - PG_HOST=postgres
+      - POSTGRES_DB=products
+      - REDIS_URL=redis://redis:6379
+      - CLIENT_ID=client-id
+      - CLIENT_SECRET=secret
+      - REDIRECT_URI=http://localhost/callback
+      - SLUG=my-app
+      - AUTH_URL=http://authentik:9000
+    behavior: replace
+  - name: pokemons
+    files:
+      - ../../pokemon.json
+    behavior: replace
+
+secretGenerator:
+  - name: pg-user
+    literals:
+      - PG_USER=postgres
+    behavior: replace
+  - name: pg-password 
+    literals:
+      - PG_PASSWORD=postgres
+    behavior: replace
+  - name: auth-pg-user
+    literals:
+      - AUTH_PG_USER=postgres
+    behavior: replace
+  - name: auth-pg-password
+    literals:
+      - AUTH_PG_PASSWORD=postgres
+    behavior: replace
+  - name: auth-secret-key
+    literals:
+      - AUTHENTIK_SECRET_KEY=secret
+    behavior: replace  

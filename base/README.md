@@ -31,7 +31,8 @@ kubectl apply -f api-network.yaml
 kubectl apply -f nginx-network.yaml
 kubectl apply -f authorization-deployment.yml 
 kubectl apply -f authorization-service.yaml
- 
+
+kubectl apply -f api-pdb.yaml
 kubectl apply -f api-deployment.yaml
 kubectl apply -f api-service.yaml
  

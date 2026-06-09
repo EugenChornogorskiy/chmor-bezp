@@ -82,6 +82,7 @@ services:
   api:
     image: eugenchornogorskiy/product-backend:v6
     container_name: api
+    
     networks:
       app-net:
         ipv4_address: 172.21.0.21

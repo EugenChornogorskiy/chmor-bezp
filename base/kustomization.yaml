@@ -1,0 +1,28 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - api-deployment.yaml
+  - api-service.yaml
+  - api-network.yaml
+  - api-pdb.yaml
+  - nginx-deployment.yaml
+  - nginx-service.yaml
+  - nginx-network.yaml
+  - nginx-conf.yaml
+  - postgres-deployment.yaml
+  - postgres-service.yaml
+  - postgres-network.yaml
+  - postgres-data-pvc.yaml
+  - redis-deployment.yaml
+  - redis-service.yaml
+  - redis-network.yaml
+  - redis-pvc.yaml
+  - authorization-deployment.yml
+  - authorization-service.yaml
+  - authorization-network.yaml
+  - authorization-pg-deployment.yaml
+  - authorization-pg-service.yaml
+  - authorization-pg-network.yaml
+  - authorization-pg-data-pvc.yaml
+  - app-config-configmap.yaml 
