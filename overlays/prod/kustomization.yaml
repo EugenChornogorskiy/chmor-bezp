@@ -20,7 +20,7 @@ configMapGenerator:
       - AUTH_URL=http://authentik:9000 
   - name: pokemons
     files:
-      - ../../base/pokemon.json 
+      - pokemon.json 
 
 secretGenerator:
   - name: pg-user
