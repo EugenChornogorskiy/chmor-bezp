@@ -25,21 +25,16 @@ configMapGenerator:
 secretGenerator:
   - name: pg-user
     literals:
-      - PG_USER=postgres
-    behavior: replace
+      - PG_USER=postgres 
   - name: pg-password 
     literals:
-      - PG_PASSWORD=postgres
-    behavior: replace
+      - PG_PASSWORD=postgres 
   - name: auth-pg-user
     literals:
-      - AUTH_PG_USER=postgres
-    behavior: replace
+      - AUTH_PG_USER=postgres 
   - name: auth-pg-password
     literals:
-      - AUTH_PG_PASSWORD=postgres
-    behavior: replace
+      - AUTH_PG_PASSWORD=postgres 
   - name: auth-secret-key
     literals:
-      - AUTHENTIK_SECRET_KEY=secret
-    behavior: replace  
+      - AUTHENTIK_SECRET_KEY=secret 
