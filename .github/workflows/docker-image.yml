@@ -131,7 +131,7 @@ jobs:
       - name: Set tag
         id: vars
         run: |
-          if [ "${{ github.ref_name }}" = "main" ]; then
+          if [ "${{ github.ref_name }}" = "new" ]; then
             echo "TAG=latest" >> $GITHUB_OUTPUT
           else
             echo "TAG=${{ github.sha }}" >> $GITHUB_OUTPUT
