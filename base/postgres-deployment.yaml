@@ -30,10 +30,7 @@ spec:
                 secretKeyRef: 
                   key: PG_USER
                   name: pg-user
-          image: postgres:15
-          securityContext:
-            runAsNonRoot: true
-            runAsUser: 999
+          image: postgres:15 
           resources:
             limits:
               cpu: "1000m"

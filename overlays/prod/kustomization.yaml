@@ -4,6 +4,9 @@ kind: Kustomization
 resources:
   - ../../base 
 
+generatorOptions:
+  disableNameSuffixHash: true
+  
 configMapGenerator:
   - name: env-common
     literals:

@@ -14,9 +14,11 @@ spec:
       labels:
         nginx: nginx 
     spec:  
+      securityContext:
+        fsGroup: 101
       containers:
         - name: nginx
-          image: ghcr.io/eugenchornogorskiy/chmor-bezp/frontend:latest
+          image: ghcr.io/eugenchornogorskiy/chmor-bezp/frontend:b616f26edd15c05aeeedb779eccf8dbd4bc3143c
           securityContext:
             runAsNonRoot: true
             runAsUser: 101
@@ -32,6 +34,10 @@ spec:
             - mountPath: /etc/nginx/nginx.conf 
               name: nginx-conf
               subPath: nginx.conf  
+            - mountPath: /var/cache/nginx
+              name: nginx-cache
+            - mountPath: /var/run
+              name: nginx-run
           livenessProbe: 
             exec:
               command:
@@ -49,6 +55,10 @@ spec:
               - key: nginx.conf
                 path: nginx.conf
             name: nginx-conf 
+        - name: nginx-cache
+          emptyDir: {}
+        - name: nginx-run
+          emptyDir: {}
       restartPolicy: Always
         
 
