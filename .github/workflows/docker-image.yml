@@ -179,8 +179,7 @@ jobs:
           fi   
 
       - name: Apply Kubernetes manifests
-        run: |
-          kubectl kustomize overlays/prod
+        run: | 
           kubectl apply -k overlays/prod
 
       - name: Wait for rollouts
