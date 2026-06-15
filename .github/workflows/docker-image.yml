@@ -51,7 +51,7 @@ jobs:
 
       - name: Install dependencies
         working-directory: backend
-        run: npm ci
+        run: npm ci 
 
       - name: Run tests
         working-directory: backend
@@ -101,6 +101,10 @@ jobs:
           fi
           echo "SHORT_SHA=${{ github.sha }}" >> $GITHUB_OUTPUT
 
+      - name: Show
+        working-directory: backend
+        run: cat backend.js
+
       - name: Build and push backend
         uses: docker/build-push-action@v5
         with:
@@ -127,6 +131,10 @@ jobs:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Show
+        working-directory: frontend
+        run: cat src/pages/Home.tsx
 
       - name: Set tag
         id: vars
