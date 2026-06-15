@@ -8,7 +8,7 @@ export const LoginProvider = ({ children }:any) => {
   const [loaded, setLoaded] = useState<boolean>(false);   
   
   useEffect(() => {
-    if (loaded) { 
+    if (loaded && token) { 
       localStorage.setItem(`Token`, token ); 
       localStorage.setItem(`idToken`, idToken ); 
     }
@@ -18,7 +18,7 @@ export const LoginProvider = ({ children }:any) => {
     const savedToken = localStorage.getItem(`Token`); 
     const savedIdToken = localStorage.getItem(`idToken`);  
     if (savedToken) {
-      setToken(savedToken)
+      setToken(savedToken.replace(/^"(.*)"$/, '$1'))
     }  
     if (savedIdToken) {
       setIdToken(savedIdToken)
