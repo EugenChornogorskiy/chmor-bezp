@@ -136,7 +136,7 @@ function ClientApp( ){
             } 
         }
         fetchData()
-    },[])   
+    },[token])   
     useEffect(() => {
         async function fetchData( ) { 
             const data = await list("list", 50,0,token) || []; 
