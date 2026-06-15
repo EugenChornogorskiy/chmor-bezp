@@ -12,7 +12,7 @@ export default function Callback() {
 
     const params = new URLSearchParams(location.search);
     const code = params.get("code");
-
+    const codeVerifier = sessionStorage.getItem('pkce_verifier');
     console.log("CODE:", code);
 
     if (!code) return;
@@ -20,7 +20,7 @@ export default function Callback() {
     fetch("/api/auth/callback", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ code }),
+        body: JSON.stringify({  code: code, code_verifier: codeVerifier  }),
     })
         .then((res) => res.json())
         .then((data) => {

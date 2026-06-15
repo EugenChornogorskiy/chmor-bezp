@@ -14,8 +14,7 @@ const register = new clientProm.Registry();
 const PORT = process.env.BACKEND_PORT;
 const startTime = Date.now();
 const AUTH_URL = process.env.AUTH_URL;
-const CLIENT_ID = process.env.CLIENT_ID;
-const CLIENT_SECRET = process.env.CLIENT_SECRET;
+const CLIENT_ID = process.env.CLIENT_ID; 
 const REDIRECT_URI = process.env.REDIRECT_URI;
 const SLUG = process.env.SLUG;
 
@@ -209,7 +208,7 @@ app.get('/stats', auth, async (req, res) => {
   res.json(response);
 });
 app.post("/auth/callback", async (req, res) => {
-  const { code } = req.body;
+  const { code,code_verifier } = req.body;
 
   if (!code) {
     return res.status(400).json({ error: "Missing code" });
@@ -220,10 +219,10 @@ app.post("/auth/callback", async (req, res) => {
       `${AUTH_URL}/application/o/token/`,
       new URLSearchParams({
         grant_type: "authorization_code",
-        client_id: CLIENT_ID,
-        client_secret: CLIENT_SECRET,
+        client_id: CLIENT_ID, 
         code: code,
         redirect_uri: REDIRECT_URI,
+        code_verifier: code_verifier,
       }),
       {
         headers: {

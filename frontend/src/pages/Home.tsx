@@ -43,14 +43,41 @@ function ClientApp( ){
             return [...prev, id];
         });
     };  
+    async function generateCodeVerifier() {
+        const array = new Uint8Array(32);
+        crypto.getRandomValues(array);
+        return btoa(Array.from(array).map(byte => String.fromCharCode(byte)).join(''))
+            .replace(/\+/g, '-')
+            .replace(/\//g, '_')
+            .replace(/=+$/, '');
+    }
+
+    async function generateCodeChallenge(verifier: string) {
+        const encoder = new TextEncoder();
+        const data = encoder.encode(verifier);
+        const hash = await crypto.subtle.digest('SHA-256', data);
+        const hashArray = new Uint8Array(hash);
+        return btoa(Array.from(hashArray).map(byte => String.fromCharCode(byte)).join(''))
+            .replace(/\+/g, '-')
+            .replace(/\//g, '_')
+            .replace(/=+$/, '');
+    }
     useEffect(() => {
         if (!token) {
-            window.location.href =
-                "http://localhost:9000/application/o/authorize/" +
-                "?client_id=0DngnLIYR9lJlxf1dcf7x3JdWCxy7jpqBlQLG7ii" +
-                "&response_type=code" +
-                "&scope=openid profile email" +
-                "&redirect_uri=http://localhost/callback";
+            const link = async function() {
+                const codeVerifier = await generateCodeVerifier();
+                const codeChallenge = await generateCodeChallenge(codeVerifier);
+                sessionStorage.setItem('pkce_verifier', codeVerifier);
+                window.location.href =
+                    "http://localhost:9000/application/o/authorize/" +
+                    "?client_id=my-app" +
+                    "&response_type=code" +
+                    "&scope=openid profile email" +
+                    "&redirect_uri=http://localhost/callback" +
+                    "&code_challenge=" + codeChallenge +
+                    "&code_challenge_method=S256";
+            } 
+            link() 
         }
     }, [token]);
     useEffect(() => {
