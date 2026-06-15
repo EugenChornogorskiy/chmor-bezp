@@ -267,7 +267,12 @@ app.get('/health', async (req, res) => {
     limit: appConfig.limit
   });
 });
-  
+init().then(() => {
+  console.log("Database initialized");
+}).catch(err => {
+  console.error("Database init failed:", err);
+});
+
 let server 
 if (process.env.NODE_ENV !== 'test') { 
 
