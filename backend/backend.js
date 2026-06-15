@@ -7,6 +7,7 @@ import fs from 'fs';
 import jwt from "jsonwebtoken";
 import jwksClient from "jwks-rsa";
 import axios from "axios";
+import { verify } from 'crypto';
 
 const { Pool } = pkg;
 const app = express();
@@ -146,7 +147,12 @@ app.get('/items', auth, async (req, res) => {
     items: result.rows.map(r => r.data)
   });
 });
- 
+app.get('/verify', auth, async (req, res) => { 
+
+  res.json({
+    verify:  "verified"
+  });
+});
 app.post('/items', auth, async (req, res) => {
   const item = {
     name: req.body.name,
