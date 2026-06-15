@@ -80,7 +80,10 @@ function auth(req, res, next) {
 
   jwt.verify(token, getKey, { audience: CLIENT_ID, issuer: `${AUTH_URL}/application/o/${SLUG}/`, }, (err, decoded) => {
     if (err) {
-      return res.status(401).json({ error: "Invalid token" });
+        return res.status(401).json({
+          error: err.name,
+          message: err.message
+        });
     }
 
     req.user = decoded;
