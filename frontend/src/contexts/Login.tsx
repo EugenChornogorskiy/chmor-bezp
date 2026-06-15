@@ -27,7 +27,7 @@ export const LoginProvider = ({ children }:any) => {
   }, []);
   useEffect(() => {
     if (loaded && token ) { 
-      axios.get('https://localhost:3000/api/verify', {
+      fetch('https://localhost:3000/api/verify', {
         headers: { Authorization: token }
       }) 
       .catch(function (error:any) {  
