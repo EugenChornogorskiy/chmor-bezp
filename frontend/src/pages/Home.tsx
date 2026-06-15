@@ -70,10 +70,10 @@ function ClientApp( ){
                 sessionStorage.setItem('pkce_verifier', codeVerifier);
                 window.location.href =
                     "http://localhost:9000/application/o/authorize/" +
-                    "?client_id=my-app" +
+                    "?client_id=" + process.env.CLIENT_ID +
                     "&response_type=code" +
                     "&scope=openid profile email" +
-                    "&redirect_uri=http://localhost/callback" +
+                    "&redirect_uri=" + process.env.REDIRECT_URI +
                     "&code_challenge=" + codeChallenge +
                     "&code_challenge_method=S256";
             } 

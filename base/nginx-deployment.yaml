@@ -18,7 +18,7 @@ spec:
         fsGroup: 101
       containers:
         - name: nginx
-          image: ghcr.io/eugenchornogorskiy/chmor-bezp/frontend:e16afd78f74db29d81ea92b6cf84add7af00b4b0
+          image: ghcr.io/eugenchornogorskiy/chmor-bezp/frontend:84741ca9202eb4807a47a7f6ef9ffc9567755400
           securityContext:
             runAsNonRoot: true
             runAsUser: 101
@@ -38,6 +38,17 @@ spec:
               name: nginx-cache
             - mountPath: /var/run
               name: nginx-run
+          env:
+            - name: CLIENT_ID
+              valueFrom:
+                configMapKeyRef:
+                  key: CLIENT_ID
+                  name: env-common
+            - name: REDIRECT_URI
+              valueFrom:
+                configMapKeyRef:
+                  key: REDIRECT_URI
+                  name: env-common 
           livenessProbe: 
             exec:
               command:
