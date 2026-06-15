@@ -28,7 +28,7 @@ export const LoginProvider = ({ children }:any) => {
   useEffect(() => {
     if (loaded && token ) { 
       fetch('/api/verify', {
-        headers: { Authorization: token }
+        headers: { Authorization: `Bearer ${token}` }
       }) 
       .catch(function (error:any) {  
         setToken("");  
