@@ -127,7 +127,9 @@ const pgPool = new Pool({
 const redisClient = createClient({
   url: `redis://redis:6379`,
 }); 
-redisClient.connect()
+if (process.env.NODE_ENV !== 'test') {
+  redisClient.connect()
+}
 const appConfig = {  instanceName: 'default', timeout: 30000, limit: 100, cacheTTL: 10 }; 
 const instanceId = process.env.INSTANCE_ID || appConfig.instanceName || "default-instance";
  
@@ -267,15 +269,15 @@ app.get('/health', async (req, res) => {
     limit: appConfig.limit
   });
 });
-init().then(() => {
-  console.log("Database initialized");
-}).catch(err => {
-  console.error("Database init failed:", err);
-});
-
+if (process.env.NODE_ENV !== 'test') {
+  init().then(() => {
+    console.log("Database initialized");
+  }).catch(err => {
+    console.error("Database init failed:", err);
+  });
+}
 let server 
-if (process.env.NODE_ENV !== 'test') { 
-
+if (process.env.NODE_ENV !== 'test') {  
   server = app.listen(PORT, () => {
     console.log(`Backend running on port ${PORT}`);
   });
