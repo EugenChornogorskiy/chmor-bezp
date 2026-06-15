@@ -13,6 +13,7 @@ import { useLogin } from '../contexts/Login';
 async function list( arr: any, limit=1000, offset=0,token:any) {
     try { 
         if (arr == "list") {
+            console.log(token)
             const response = await fetch('/api/items', {
                 headers: {
                     Authorization: `Bearer ${token}`

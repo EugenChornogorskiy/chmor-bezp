@@ -18,7 +18,7 @@ export const LoginProvider = ({ children }:any) => {
     const savedToken = localStorage.getItem(`Token`); 
     const savedIdToken = localStorage.getItem(`idToken`);  
     if (savedToken) {
-      setToken(savedToken.replace(/^"(.*)"$/, '$1'))
+      setToken(savedToken)
     }  
     if (savedIdToken) {
       setIdToken(savedIdToken)
@@ -27,6 +27,7 @@ export const LoginProvider = ({ children }:any) => {
   }, []);
   useEffect(() => {
     if (loaded && token ) { 
+      console.log( token ); 
       fetch('/api/verify', {
         headers: { Authorization: `Bearer ${token}` }
       }) 
