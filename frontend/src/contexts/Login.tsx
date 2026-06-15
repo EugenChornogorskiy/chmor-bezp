@@ -10,7 +10,7 @@ export const LoginProvider = ({ children }:any) => {
   useEffect(() => {
     if (loaded) { 
       localStorage.setItem(`Token`, token ); 
-      localStorage.setItem(`idToken`, token ); 
+      localStorage.setItem(`idToken`, idToken ); 
     }
   }, [token]);
  
@@ -18,10 +18,10 @@ export const LoginProvider = ({ children }:any) => {
     const savedToken = localStorage.getItem(`Token`); 
     const savedIdToken = localStorage.getItem(`idToken`);  
     if (savedToken) {
-      setToken(savedToken.replace(/^"(.*)"$/, '$1'))
+      setToken(savedToken)
     }  
     if (savedIdToken) {
-      setIdToken(savedIdToken.replace(/^"(.*)"$/, '$1'))
+      setIdToken(savedIdToken)
     }  
     setLoaded(true);
   }, []);
@@ -41,7 +41,7 @@ export const LoginProvider = ({ children }:any) => {
     setToken(action) 
   }
   const addIdToken = (action: any) => {  
-    setToken(action) 
+    setIdToken(action) 
   }  
   const value = {  
     token, 
