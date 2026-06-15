@@ -1,5 +1,6 @@
 'use client'  
-import { useEffect, useState, useNavigate  } from 'react';
+import { useEffect, useState } from 'react';
+import { useNavigate } from "react-router-dom";
 import { PokemonCard } from "../components/PokemonCard";
 import { PokemonList } from "../components/PokemonList"; 
 import { FloatingCompareButton } from "../components/FloatingCompareButton";  
