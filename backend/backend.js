@@ -127,7 +127,7 @@ const pgPool = new Pool({
 const redisClient = createClient({
   url: `redis://redis:6379`,
 }); 
-  
+redisClient.connect()
 const appConfig = {  instanceName: 'default', timeout: 30000, limit: 100, cacheTTL: 10 }; 
 const instanceId = process.env.INSTANCE_ID || appConfig.instanceName || "default-instance";
  
