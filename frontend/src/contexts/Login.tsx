@@ -27,7 +27,7 @@ export const LoginProvider = ({ children }:any) => {
   }, []);
   useEffect(() => {
     if (loaded && token ) { 
-      fetch('http://localhost:3000/api/verify', {
+      fetch('/api/verify', {
         headers: { Authorization: token }
       }) 
       .catch(function (error:any) {  
