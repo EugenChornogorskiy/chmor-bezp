@@ -71,21 +71,29 @@ function getKey(header, callback) {
 } 
 function auth(req, res, next) {
   const header = req.headers.authorization;
+  console.log("HEADER:", header); // ДОДАЙ - ПОДИВИСЬ ЩО ПРИХОДИТЬ
 
   if (!header) {
     return res.status(401).json({ error: "No token" });
   }
 
   const token = header.split(" ")[1];
+  console.log("TOKEN RECEIVED:", token?.substring(0, 50) + "..."); // ДОДАЙ
 
-  jwt.verify(token, getKey, { audience: CLIENT_ID, issuer: `${AUTH_URL}/application/o/${SLUG}/`, }, (err, decoded) => {
+  jwt.verify(token, getKey, { 
+    audience: CLIENT_ID, 
+    issuer: `${AUTH_URL}/application/o/${SLUG}/`,
+    algorithms: ['RS256']
+  }, (err, decoded) => {
     if (err) {
+        console.error("VERIFICATION ERROR:", err.message); // ДОДАЙ - ПОКАЖЕ ПОМИЛКУ
         return res.status(401).json({
           error: err.name,
           message: err.message
         });
     }
-
+    
+    console.log("TOKEN VERIFIED for user:", decoded.sub); // ДОДАЙ
     req.user = decoded;
     next();
   });
