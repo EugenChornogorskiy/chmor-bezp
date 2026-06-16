@@ -36,8 +36,7 @@ const httpRequestDuration = new clientProm.Histogram({
   registers: [register],
 });
 
-app.use(express.json({ limit: '10mb' }));
-
+app.use(express.json({ limit: '10mb' })); 
 app.use((req, res, next) => {
   const end = httpRequestDuration.startTimer();
   res.on('finish', () => {
@@ -49,18 +48,15 @@ app.use((req, res, next) => {
     end({ method: req.method, route: req.route?.path || req.path });
   });
   next();
-});
-
+}); 
 let requestCount = 0;
 app.use((req, res, next) => {
   requestCount++;
   next();
-}); 
-
+});  
 const client = jwksClient({
   jwksUri: `${AUTH_URL}/application/o/${SLUG}/jwks/`
-});
-
+}); 
 function getKey(header, callback) {
   client.getSigningKey(header.kid, function (err, key) {
     if (err) return callback(err);
@@ -71,14 +67,14 @@ function getKey(header, callback) {
 } 
 function auth(req, res, next) {
   const header = req.headers.authorization;
-  console.log("HEADER:", header); // ДОДАЙ - ПОДИВИСЬ ЩО ПРИХОДИТЬ
+  console.log("HEADER:", header); 
 
   if (!header) {
     return res.status(401).json({ error: "No token" });
   }
 
   const token = header.split(" ")[1];
-  console.log("TOKEN RECEIVED:", token?.substring(0, 50) + "..."); // ДОДАЙ
+  console.log("TOKEN RECEIVED:", token?.substring(0, 50) + "..."); 
 
   jwt.verify(token, getKey, { 
     audience: CLIENT_ID, 
@@ -86,14 +82,14 @@ function auth(req, res, next) {
     algorithms: ['RS256']
   }, (err, decoded) => {
     if (err) {
-        console.error("VERIFICATION ERROR:", err.message); // ДОДАЙ - ПОКАЖЕ ПОМИЛКУ
+        console.error("VERIFICATION ERROR:", err.message); 
         return res.status(401).json({
           error: err.name,
           message: err.message
         });
     }
     
-    console.log("TOKEN VERIFIED for user:", decoded.sub); // ДОДАЙ
+    console.log("TOKEN VERIFIED for user:", decoded.sub); 
     req.user = decoded;
     next();
   });
@@ -158,12 +154,14 @@ app.get('/items', auth, async (req, res) => {
     items: result.rows.map(r => r.data)
   });
 });
+
 app.get('/verify', auth, async (req, res) => { 
 
   res.json({
     verify:  "verified"
   });
 });
+
 app.post('/items', auth, async (req, res) => {
   const item = {
     name: req.body.name,
@@ -226,6 +224,7 @@ app.get('/stats', auth, async (req, res) => {
   res.set('X-Cache', 'MISS');
   res.json(response);
 });
+
 app.post("/auth/callback", async (req, res) => {
   const { code,code_verifier } = req.body;
 
@@ -263,6 +262,7 @@ app.post("/auth/callback", async (req, res) => {
     });
   }
 }); 
+
 app.get('/health', async (req, res) => {
   let pgStatus = 'down';
   let redisStatus = 'down';
