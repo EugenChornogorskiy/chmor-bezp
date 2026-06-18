@@ -301,7 +301,7 @@ app.post('/auth/logout', auth, async (req, res) => {
         } while (cursor !== '0');
          
         const logoutUrl = `${AUTH_URL}/application/o/${SLUG}/end-session/`;
-        const idToken = req.headers.authorization?.split(' ')[1];
+        const idToken = req.headers['x-id-token'];
          
         res.json({
             message: 'Successfully logged out from application',

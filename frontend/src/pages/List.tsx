@@ -48,7 +48,7 @@ function ClientApp( ){
     const [page, setPage] = useState(0);   
     const [loaded, setLoaded] = useState(false);
     const [createdList, setCreatedList] = useState<string[]>( []);  
-    const {token,addIdToken,addToken}:any = useLogin()
+    const {token,addIdToken,addToken,idToken}:any = useLogin()
     const [role, setRole] = useState<string>(""); 
     const navigate = useNavigate();
     const toggleComparision = (id: any) => {
@@ -209,6 +209,7 @@ function ClientApp( ){
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${token}`,
+                    'X-ID-Token': idToken,
                     'Content-Type': 'application/json'
                 }
             });
