@@ -231,8 +231,7 @@ function ClientApp( ){
             addToken("");
             addIdToken("");
              
-            if (data.logoutUrl && data.id_token) { 
-                setTimeout(1000)
+            if (data.logoutUrl && data.id_token) {  
                 const logoutRedirectUrl = `${data.logoutUrl}?id_token_hint=${data.id_token}&post_logout_redirect_uri=${encodeURIComponent('http://localhost/callback')}`;
                 window.location.href = logoutRedirectUrl;
             } else { 
