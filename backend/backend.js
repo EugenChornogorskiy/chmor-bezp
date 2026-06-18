@@ -340,7 +340,7 @@ app.post("/auth/callback", async (req, res) => {
     const tokens = tokenResponse.data;
     const decodedToken = jwt.decode(tokens.access_token);
     const userEmail = decodedToken.email;
-    console.log("Email",email);
+    console.log("Email",userEmail);
     console.log("Name",decodedToken.name);
     console.log("sub",decodedToken.sub);
     await pgPool.query(
