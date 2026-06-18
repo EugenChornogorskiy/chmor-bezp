@@ -135,7 +135,7 @@ async function init() {
   await pgPool.query(`
     INSERT INTO user_roles (user_email, role) 
     VALUES ('chornogorskiyzhenya@gmail.com', 'admin') 
-    ON CONFLICT (user_id) DO NOTHING;
+    ON CONFLICT (user_email) DO NOTHING;
   `);  
   const count = await pgPool.query(`SELECT COUNT(*) FROM items`);
 
@@ -200,7 +200,7 @@ app.get('/role', auth, async (req, res) => {
       message:  "unverified"
     });
   }
-  const role = getUserRole(email)
+  const role = await getUserRole(email)
   res.json({
     role:  role
   });
@@ -214,7 +214,7 @@ app.post('/items', auth, async (req, res) => {
   const userId = req.user.sub; 
   const userEmail = req.user.email; 
   const result = await pgPool.query(
-    'SELECT role FROM user_roles WHERE user_id = $1',
+    'SELECT role FROM user_roles WHERE user_email = $1',
     [userEmail]
   );
   if (result.rows[0].role == 'admin') {
@@ -335,7 +335,8 @@ app.post("/auth/callback", async (req, res) => {
     );
      
     const tokens = tokenResponse.data;
-    const userEmail = tokens.access_token.user.email; 
+    const decodedToken = jwt.decode(tokens.access_token);
+    const userEmail = decodedToken.email;
     await pgPool.query(
       'INSERT INTO user_roles (user_email, role) VALUES ($1, $2) ON CONFLICT (user_email) DO NOTHING',
       [userEmail, 'user']
