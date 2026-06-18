@@ -118,8 +118,8 @@ function ClientApp( ){
         <header>
             <div id="nav-items"> 
                 <img id="logo"src="Pokemon-Logo.png" alt="" />  
-                {!token && <p className="rand" onClick={() => Register()}>Register</p> }
-                {!token && <p className="rand" onClick={() => Login()}>Login</p> }
+                {token.length == 0 && <p className="rand" onClick={() => Register()}>Register</p> }
+                {token.length == 0 && <p className="rand" onClick={() => Login()}>Login</p> }
                 <Link key={sidePanel.rand} to={`/pokemon/${sidePanel.rand}`}>
                     <p className="rand">Random pokemon</p>
                 </Link>    
@@ -132,7 +132,7 @@ function ClientApp( ){
             </div> 
             <div id ="wrapper"> 
                 <p id = "welcome-message">Welcome to <span style={{color:"red"}}>Pokemon-Stats</span></p>
-                {token && <Link to={"/list"}>
+                {token.length > 0 && <Link to={"/list"}>
                     <button id ="welcome-button">Start</button>
                 </Link>}
            </div>

@@ -251,7 +251,7 @@ function ClientApp( ){
                 <img id="logo"src="Pokemon-Logo.png" alt="" /> 
                 {role == "admin" && <p className="rand" onClick={() => setCreationForm(true)}>Create Pokemon</p> }
                 {role.length > 0 && <p className="rand" >{role}</p> }
-                {token && <p className="rand" onClick={() => logOut()}>Log-out</p> }
+                {token.length > 0 && <p className="rand" onClick={() => logOut()}>Log-out</p> }
                 <Link key={sidePanel.rand} to={`/pokemon/${sidePanel.rand}`}>
                     <p className="rand">Random pokemon</p>
                 </Link>   
