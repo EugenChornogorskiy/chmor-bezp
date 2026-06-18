@@ -131,12 +131,7 @@ async function init() {
         role VARCHAR(20) DEFAULT 'user',
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     ) 
-  `);
-  await pgPool.query(`
-    INSERT INTO user_roles (user_email, role) 
-    VALUES ('chornogorskiyzhenya@gmail.com', 'admin') 
-    ON CONFLICT (user_email) DO NOTHING;
-  `);  
+  `); 
   const count = await pgPool.query(`SELECT COUNT(*) FROM items`);
 
   if (parseInt(count.rows[0].count) === 0) {
@@ -193,40 +188,23 @@ app.get('/verify', auth, async (req, res) => {
     verify:  "verified"
   });
 });
-app.get('/roleA', async (req, res) => {   
-  const header = req.headers.authorization;
-  console.log("HEADER:", header); 
-
-  if (!header) {
-    return res.status(401).json({ error: "No token" });
-  }
-
-  const token = header.split(" ")[1];
-  const response = await fetch(`${AUTH_URL}/application/o/userinfo/`, {
-        headers: {
-            'Authorization': `Bearer ${token}`
-        }
-  });
-  const data = await response.json();
-  console.log('User info:', data);
-  res.json({
-    role:  data
-  });
-})
 app.get('/role', auth, async (req, res) => {   
-  const email = req.user.email;
-  const name = req.user.name;
-  console.log("Email",email); 
-  if (!email) {
-    res.status(403).json({
-      message:  "unverified"
+  try { 
+    const userEmail = req.user.email
+    const result = await pgPool.query(
+      'SELECT role FROM user_roles WHERE user_email = $1',
+      [userEmail]
+    ); 
+    res.json({
+      role: result.rows[0].role, 
+    });  
+  } catch (error) {
+    console.error('Error fetching user role:', error);
+    res.status(500).json({
+      error: "Failed to get user role",
+      message: error.message
     });
-  } 
-  const role = await getUserRole(email)
-  console.log("Email",email,role);
-  res.json({
-    role:  role
-  });
+  }
 });
 app.post('/items', auth, async (req, res) => {
   const item = {
@@ -368,11 +346,33 @@ app.post("/auth/callback", async (req, res) => {
     const userEmail = decodedToken.email;
     console.log("Email",userEmail);
     console.log("Name",decodedToken.name);
-    console.log("sub",decodedToken.sub);
-    await pgPool.query(
-      'INSERT INTO user_roles (user_email, role) VALUES ($1, $2) ON CONFLICT (user_email) DO NOTHING',
-      [userEmail, 'user']
-    ); 
+    console.log("sub",decodedToken.sub); 
+    const response = await fetch(`${AUTH_URL}/application/o/userinfo/`, {
+      headers: {
+        'Authorization': `Bearer ${tokens.access_token}`
+      }
+    });
+    
+    if (!response.ok) {
+      throw new Error(`User info request failed: ${response.status}`);
+    }
+    
+    const data = await response.json();
+    console.log('User info:', data);
+     
+    const isAdmin = data.groups?.includes("authentik Admins") 
+    
+    if (isAdmin) {
+      await pgPool.query(
+        'INSERT INTO user_roles (user_email, role) VALUES ($1, $2) ON CONFLICT (user_email) DO NOTHING',
+        [userEmail, 'admin']
+      ); 
+    } else {
+      await pgPool.query(
+        'INSERT INTO user_roles (user_email, role) VALUES ($1, $2) ON CONFLICT (user_email) DO NOTHING',
+        [userEmail, 'user']
+      ); 
+    } 
     const result = await pgPool.query(
       'SELECT role FROM user_roles WHERE user_email = $1',
       [userEmail]
