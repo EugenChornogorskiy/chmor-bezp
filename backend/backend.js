@@ -196,14 +196,14 @@ app.get('/verify', auth, async (req, res) => {
 app.get('/role', auth, async (req, res) => {   
   const email = req.user.email;
   const name = req.user.name;
-  console.log("Email",email);
-  console.log("Name",name);
+  console.log("Email",email); 
   if (!email) {
     res.status(403).json({
       message:  "unverified"
     });
   }
   const role = await getUserRole(email)
+  console.log("Email",email,role);
   res.json({
     role:  role
   });
