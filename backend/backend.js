@@ -302,7 +302,8 @@ app.post('/auth/logout', auth, async (req, res) => {
          
         const logoutUrl = `${AUTH_URL}/application/o/${SLUG}/end-session/`;
         const idToken = req.headers['x-id-token'];
-         
+        console.log('ID Token exists:', !!idToken);
+        console.log('ID Token first chars:', idToken?.substring(0, 30));
         res.json({
             message: 'Successfully logged out from application',
             user: userEmail,
