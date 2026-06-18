@@ -193,9 +193,9 @@ app.get('/verify', auth, async (req, res) => {
     verify:  "verified"
   });
 });
-app.get('/role', auth, async (req, res) => { 
-  const email = req.query.email;
-  const name = req.query.name;
+app.get('/role', auth, async (req, res) => {   
+  const email = req.user.email;
+  const name = req.user.name;
   console.log("Email",email);
   console.log("Name",name);
   if (!email) {
