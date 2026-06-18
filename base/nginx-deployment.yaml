@@ -18,7 +18,7 @@ spec:
         fsGroup: 101
       containers:
         - name: nginx
-          image: ghcr.io/eugenchornogorskiy/chmor-bezp/frontend:5763b2e0bdee9368e8b32816e5ebc8112f337900
+          image: ghcr.io/eugenchornogorskiy/chmor-bezp/frontend:b5b72df9af5cebfec3512d782275d5d406f94d84
           securityContext:
             runAsNonRoot: true
             runAsUser: 101

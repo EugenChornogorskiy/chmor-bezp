@@ -25,7 +25,7 @@ spec:
           command: ["sh", "-c", "until pg_isready -h postgres; do sleep 2; done"] 
       containers:
         - name: api   
-          image: ghcr.io/eugenchornogorskiy/chmor-bezp/backend:5763b2e0bdee9368e8b32816e5ebc8112f337900
+          image: ghcr.io/eugenchornogorskiy/chmor-bezp/backend:b5b72df9af5cebfec3512d782275d5d406f94d84
           securityContext:
             runAsNonRoot: true
             runAsUser: 1001

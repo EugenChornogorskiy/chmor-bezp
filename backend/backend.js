@@ -285,6 +285,7 @@ app.post('/auth/logout', auth, async (req, res) => {
     try {
         const userEmail = req.user.email;
         console.log(`User ${userEmail} is logging out`); 
+         
         const pattern = `stats:${req.user.sub}:*`;
         let cursor = '0';
         do {
@@ -299,15 +300,19 @@ app.post('/auth/logout', auth, async (req, res) => {
             }
         } while (cursor !== '0');
          
-        
+        const logoutUrl = `${AUTH_URL}/application/o/${SLUG}/end-session/`;
+        const idToken = req.headers.authorization?.split(' ')[1];
+         
         res.json({
-            message: 'Successfully logged out',
+            message: 'Successfully logged out from application',
             user: userEmail,
-            timestamp: new Date().toISOString()
+            timestamp: new Date().toISOString(),
+            logoutUrl: logoutUrl,
+            id_token: idToken 
         });
     } catch (err) {
         console.error('Logout error:', err); 
-        res.json({
+        res.status(500).json({
             message: 'Logged out (with errors)',
             error: err.message
         });

@@ -198,24 +198,48 @@ function ClientApp( ){
             setFilters((prev :any) => ({ ...prev, [key]: value  }));
         }
     }   
-    const logOut = async ( ) => { 
-        if (token) {
+    const logOut = async () => { 
+        if (!token) {
+            navigate("/");
+            return;
+        }
+        
+        try {
             const response = await fetch('/api/auth/logout', {
                 method: 'POST',
                 headers: {
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json'
-            }});
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
+            });
+            
             if (!response.ok) {
-                console.warn('Server logout failed:', await response.text());
-            } 
-            else {
-                console.log('Successfully logged out on server');
-                addToken("")
-                addIdToken("")
+                console.warn('Server logout failed:', await response.text()); 
+                addToken("");
+                addIdToken("");
+                navigate("/");
+                return;
             }
-        } 
-    }     
+            
+            const data = await response.json();
+            console.log('Logout response:', data);
+             
+            addToken("");
+            addIdToken("");
+             
+            if (data.logoutUrl && data.id_token) { 
+                const logoutRedirectUrl = `${data.logoutUrl}?id_token_hint=${data.id_token}&post_logout_redirect_uri=${encodeURIComponent('http://localhost/callback')}`;
+                window.location.href = logoutRedirectUrl;
+            } else { 
+                navigate("/");
+            }
+        } catch (error) {
+            console.error('Logout error:', error);
+            addToken("");
+            addIdToken("");
+            navigate("/");
+        }
+    }
     return ( 
     <div id ="root"> 
         <header>
