@@ -26,18 +26,26 @@ export const LoginProvider = ({ children }:any) => {
     setLoaded(true);
   }, []);
   useEffect(() => {
-    if (loaded && token ) { 
+    if (loaded && token.length > 0 ) { 
       console.log( token ); 
       fetch('/api/verify', {
         headers: { Authorization: `Bearer ${token}` }
-      }) 
-      .catch(function (error:any) {  
-        console.log( token ); 
-        setToken("");  
-        setIdToken("")
+      })
+      .then(async (res) => {
+        if (!res.ok) {
+          setToken("");
+          setIdToken("");
+          localStorage.removeItem('Token');
+          localStorage.removeItem('idToken');
+        } 
+      })
+      .catch((error) => {
+        console.log(token);
+        setToken("");
+        setIdToken("");
         localStorage.removeItem('Token');
         localStorage.removeItem('idToken');
-      });   
+      });
     } 
   }, [loaded]); 
   const addToken = (action: any) => {  

@@ -83,9 +83,7 @@ function ClientApp( ){
                     "&code_challenge=" + codeChallenge +
                     "&code_challenge_method=S256";
     }     
-    const Register = async ( ) => { 
-        window.location.href = "http://localhost:9000/if/flow/default-source-enrollment/";
-    }  
+    
     const logOut = async () => { 
         if (!token) {
             navigate("/");
@@ -116,6 +114,12 @@ function ClientApp( ){
              
             addToken("");
             addIdToken(""); 
+            if (data.logoutUrl && data.id_token) {  
+                const logoutRedirectUrl = `${data.logoutUrl}?id_token_hint=${data.id_token}&post_logout_redirect_uri=${encodeURIComponent('http://localhost/callback')}`;
+                window.location.href = logoutRedirectUrl;
+            } else { 
+                navigate("/");
+            }
         } catch (error) {
             console.error('Logout error:', error);
             addToken("");
@@ -127,8 +131,7 @@ function ClientApp( ){
     <div id ="root"> 
         <header>
             <div id="nav-items"> 
-                <img id="logo"src="Pokemon-Logo.png" alt="" />  
-                {token.length == 0 && <p className="rand" onClick={() => Register()}>Register</p> }
+                <img id="logo"src="Pokemon-Logo.png" alt="" />   
                 {token.length == 0 && <p className="rand" onClick={() => Login()}>Login</p> } 
                 {token.length > 0 && <p className="rand" onClick={() => logOut()}>Log-out</p> }
                 <img id="nav-ball"src="master-ball2.png" alt="" /> 
