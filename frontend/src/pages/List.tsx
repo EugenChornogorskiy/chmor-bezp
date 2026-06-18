@@ -185,6 +185,15 @@ function ClientApp( ){
                     addIdToken("")
                     addToken("")
                 });
+            fetch(`/api/roleA`, {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+                })
+                .then(res => res.json())
+                .then(data => { 
+                    console.log(data.role)
+                }) 
         } 
     }, [token]); 
     const filtfunc = (form: any, key: any,value : any) => {

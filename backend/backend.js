@@ -193,6 +193,26 @@ app.get('/verify', auth, async (req, res) => {
     verify:  "verified"
   });
 });
+app.get('/roleA', async (req, res) => {   
+  const header = req.headers.authorization;
+  console.log("HEADER:", header); 
+
+  if (!header) {
+    return res.status(401).json({ error: "No token" });
+  }
+
+  const token = header.split(" ")[1];
+  const response = await fetch(`${AUTH_URL}/application/o/userinfo/`, {
+        headers: {
+            'Authorization': `Bearer ${token}`
+        }
+  });
+  const data = await response.json();
+  console.log('User info:', data);
+  res.json({
+    role:  data
+  });
+})
 app.get('/role', auth, async (req, res) => {   
   const email = req.user.email;
   const name = req.user.name;
@@ -201,7 +221,7 @@ app.get('/role', auth, async (req, res) => {
     res.status(403).json({
       message:  "unverified"
     });
-  }
+  } 
   const role = await getUserRole(email)
   console.log("Email",email,role);
   res.json({
