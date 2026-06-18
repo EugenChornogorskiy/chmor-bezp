@@ -84,18 +84,7 @@ function ClientApp( ){
                     "&code_challenge_method=S256";
     }     
     const Register = async ( ) => { 
-                const codeVerifier = await generateCodeVerifier();
-                const codeChallenge = await generateCodeChallenge(codeVerifier);
-                sessionStorage.setItem('pkce_verifier', codeVerifier);
-                window.location.href =
-                    "http://localhost:9000/application/o/authorize/" +
-                    "?client_id=" + (process.env.REACT_APP_CLIENT_ID || "my-app") +
-                    "&response_type=code" +
-                    "&scope=openid profile email" +
-                    "&redirect_uri=" + (process.env.REDIRECT_URI || "http://localhost/callback")  +
-                    "&code_challenge=" + codeChallenge +
-                    "&code_challenge_method=S256" +
-                    "&flow=default-source-enrollment";
+        window.location.href = "http://localhost:9000/if/flow/default-source-enrollment/";
     }  
     const logOut = async () => { 
         if (!token) {
