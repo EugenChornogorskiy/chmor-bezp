@@ -48,7 +48,8 @@ function ClientApp( ){
     const [page, setPage] = useState(0);   
     const [loaded, setLoaded] = useState(false);
     const [createdList, setCreatedList] = useState<string[]>( []);  
-    const {token}:any = useLogin()
+    const {token,addIdToken,addToken}:any = useLogin()
+    const [role, setRole] = useState<string>(""); 
     const navigate = useNavigate();
     const toggleComparision = (id: any) => {
         setComparisonList((prev:any) => { 
@@ -163,6 +164,19 @@ function ClientApp( ){
             localStorage.setItem(`pokemons`, JSON.stringify(pokemons));
         }
     }, [pokemons]); 
+    useEffect(() => { 
+        if (token) {
+            fetch(`/api/role`, {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+                })
+                .then(res => res.json())
+                .then(data => {
+                    setRole(data.role)
+                });
+        } 
+    }, [token]); 
     const filtfunc = (form: any, key: any,value : any) => {
         if (form=="add") {
             if (key == "types" || key == "abilities") {
@@ -183,19 +197,36 @@ function ClientApp( ){
         else{
             setFilters((prev :any) => ({ ...prev, [key]: value  }));
         }
+    }   
+    const logOut = async ( ) => { 
+        if (token) {
+            const response = await fetch('/auth/logout', {
+                method: 'POST',
+                headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            }});
+            if (!response.ok) {
+                console.warn('Server logout failed:', await response.text());
+            } 
+            else {
+                console.log('Successfully logged out on server');
+                addToken("")
+                addIdToken("")
+            }
+        } 
     }     
     return ( 
     <div id ="root"> 
         <header>
             <div id="nav-items"> 
                 <img id="logo"src="Pokemon-Logo.png" alt="" /> 
-                <p className="rand" onClick={() => setCreationForm(true)}>Create Pokemon</p> 
+                {role == "admin" && <p className="rand" onClick={() => setCreationForm(true)}>Create Pokemon</p> }
+                {role.length > 0 && <p className="rand" >{role}</p> }
+                {token && <p className="rand" onClick={() => logOut()}>Log-out</p> }
                 <Link key={sidePanel.rand} to={`/pokemon/${sidePanel.rand}`}>
                     <p className="rand">Random pokemon</p>
-                </Link>  
-                <Link to={`/team-builder`}>
-                    <p className="rand">Team</p>
-                </Link>    
+                </Link>   
                 <p className ="rand"onClick={async () => { 
                     pagePokemons .every(p => favorite.includes(p.id)) ? setPagePokemons(pokemons .slice(0,50)) : setPagePokemons(pokemons .filter(p => favorite.includes(p.id)))} }>Favorites: {favorite.length}</p>  
                 <img id="nav-ball"src="master-ball2.png" alt="" /> 

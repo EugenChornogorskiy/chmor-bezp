@@ -57,6 +57,25 @@ app.use((req, res, next) => {
 const client = jwksClient({
   jwksUri: `${AUTH_URL}/application/o/${SLUG}/jwks/`
 }); 
+async function getUserRole(userEmail) {
+    if (!userEmail) return 'user';
+    
+    try {
+        const result = await pgPool.query(
+            'SELECT role FROM user_roles WHERE user_email = $1',
+            [userEmail]
+        );
+        
+        if (result.rows.length > 0) {
+            return result.rows[0].role;
+        }
+          
+        return 'user';
+    } catch (err) {
+        console.error('Error getting user role:', err);
+        return 'user';
+    }
+}
 function getKey(header, callback) {
   client.getSigningKey(header.kid, function (err, key) {
     if (err) return callback(err);
@@ -101,10 +120,23 @@ async function init() {
       id SERIAL PRIMARY KEY,
       name TEXT UNIQUE,
       user_id TEXT,
+      user_email TEXT,
       data JSONB
     )
   `);
-
+  await pgPool.query(`
+    CREATE TABLE IF NOT EXISTS user_roles (
+        id SERIAL PRIMARY KEY,
+        user_email TEXT UNIQUE NOT NULL,
+        role VARCHAR(20) DEFAULT 'user',
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    ) 
+  `);
+  await pgPool.query(`
+    INSERT INTO user_roles (user_email, role) 
+    VALUES ('chornogorskiyzhenya@gmail.com', 'admin') 
+    ON CONFLICT (user_id) DO NOTHING;
+  `);  
   const count = await pgPool.query(`SELECT COUNT(*) FROM items`);
 
   if (parseInt(count.rows[0].count) === 0) {
@@ -161,7 +193,18 @@ app.get('/verify', auth, async (req, res) => {
     verify:  "verified"
   });
 });
-
+app.get('/role', auth, async (req, res) => { 
+  const email = req.query.email;
+  if (!email) {
+    res.status(403).json({
+      message:  "unverified"
+    });
+  }
+  const role = getUserRole(email)
+  res.json({
+    role:  role
+  });
+});
 app.post('/items', auth, async (req, res) => {
   const item = {
     name: req.body.name,
@@ -169,11 +212,22 @@ app.post('/items', auth, async (req, res) => {
   };
 
   const userId = req.user.sub; 
-
-  await pgPool.query(
-    'INSERT INTO items(name, data, user_id) VALUES($1, $2, $3)',
-    [item.name, item, userId]
+  const userEmail = req.user.email; 
+  const result = await pgPool.query(
+    'SELECT role FROM user_roles WHERE user_id = $1',
+    [userEmail]
   );
+  if (result.rows[0].role == 'admin') {
+    await pgPool.query(
+      'INSERT INTO items(name, data, user_id) VALUES($1, $2, $3)',
+      [item.name, item, userId]
+    );
+  }
+  else{
+    res.status(403).json({ 
+      message: "user not allowed "
+    });
+  } 
 
   res.status(201).json({
     item,
@@ -224,7 +278,38 @@ app.get('/stats', auth, async (req, res) => {
   res.set('X-Cache', 'MISS');
   res.json(response);
 });
-
+app.post('/auth/logout', auth, async (req, res) => {
+    try {
+        const userEmail = req.user.email;
+        console.log(`User ${userEmail} is logging out`); 
+        const pattern = `stats:${req.user.sub}:*`;
+        let cursor = '0';
+        do {
+            const reply = await redisClient.scan(cursor, {
+                MATCH: pattern,
+                COUNT: 100
+            });
+            cursor = reply.cursor;
+            for (const key of reply.keys) {
+                await redisClient.del(key);
+                console.log(`Deleted cache key: ${key}`);
+            }
+        } while (cursor !== '0');
+         
+        
+        res.json({
+            message: 'Successfully logged out',
+            user: userEmail,
+            timestamp: new Date().toISOString()
+        });
+    } catch (err) {
+        console.error('Logout error:', err); 
+        res.json({
+            message: 'Logged out (with errors)',
+            error: err.message
+        });
+    }
+});
 app.post("/auth/callback", async (req, res) => {
   const { code,code_verifier } = req.body;
 
@@ -248,12 +333,21 @@ app.post("/auth/callback", async (req, res) => {
         },
       }
     );
- 
+     
     const tokens = tokenResponse.data;
-
+    const userEmail = tokens.access_token.user.email; 
+    await pgPool.query(
+      'INSERT INTO user_roles (user_email, role) VALUES ($1, $2) ON CONFLICT (user_email) DO NOTHING',
+      [userEmail, 'user']
+    ); 
+    const result = await pgPool.query(
+      'SELECT role FROM user_roles WHERE user_email = $1',
+      [userEmail]
+    );
     return res.json({
       access_token: tokens.access_token,
       id_token: tokens.id_token, 
+      role: result.rows[0].role
     });
   } catch (err) {
     return res.status(401).json({
