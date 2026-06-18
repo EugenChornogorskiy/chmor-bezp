@@ -173,7 +173,7 @@ if (process.env.NODE_ENV !== 'test') {
 const appConfig = {  instanceName: 'default', timeout: 30000, limit: 100, cacheTTL: 10 }; 
 const instanceId = process.env.INSTANCE_ID || appConfig.instanceName || "default-instance";
  
-app.get('/metrics', async (req, res) => {
+app.get('/metrics', auth,async (req, res) => {
   res.set('Content-Type', register.contentType);
   res.end(await register.metrics());
 }); 

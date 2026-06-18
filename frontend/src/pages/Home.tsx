@@ -83,7 +83,19 @@ function ClientApp( ){
                     "&code_challenge=" + codeChallenge +
                     "&code_challenge_method=S256";
     }     
-
+    const getMetrics = async () => {
+        try {
+            const response = await fetch('/api/metrics', {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+            const metrics = await response.text();
+            console.log(metrics); 
+        } catch (error) {
+            console.error('Error fetching metrics:', error);
+        }
+    };
     const logOut = async () => { 
         if (!token) {
             navigate("/");
@@ -134,6 +146,7 @@ function ClientApp( ){
                 <img id="logo"src="Pokemon-Logo.png" alt="" />   
                 {token.length == 0 && <p className="rand" onClick={() => Login()}>Login</p> } 
                 {token.length > 0 && <p className="rand" onClick={() => logOut()}>Log-out</p> }
+                {token.length > 0 && <p className="rand" onClick={() => getMetrics()}>Metrics</p> }
                 <img id="nav-ball"src="master-ball2.png" alt="" /> 
             </div>
         </header>

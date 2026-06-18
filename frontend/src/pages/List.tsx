@@ -137,8 +137,9 @@ function ClientApp( ){
             else{ 
                 setPokemons(data)
                 setPagePokemons(data .slice(0,50))
-                const rand = Math.floor(Math.random() * 1001)
-                setSidePanel({ top, random,rand })     
+                const rand = Math.floor(Math.random() * data.length)
+                const randP= data[rand].name
+                setSidePanel({ top, random,randP })     
             } 
         } 
         if (token) { 
@@ -152,8 +153,9 @@ function ClientApp( ){
             const top =  [ data.find((p:any) => p.name == "charizard"),data.find((p:any) => p.name == "bulbasaur")]   
             setPokemons(data)
             setPagePokemons(data .slice(0,50))
-            const rand = Math.floor(Math.random() * 1001)
-            setSidePanel({ top, random,rand })   
+            const rand = Math.floor(Math.random() * data.length)
+            const randP= data[rand].name 
+            setSidePanel({ top, random,randP })   
             localStorage.setItem(`pokemons`, JSON.stringify(data));   
         }
         const timer = window.setTimeout(() => {
@@ -263,7 +265,7 @@ function ClientApp( ){
                 {role == "admin" && <p className="rand" onClick={() => setCreationForm(true)}>Create Pokemon</p> }
                 {role.length > 0 && <p className="rand" >{role}</p> }
                 {token.length > 0 && <p className="rand" onClick={() => logOut()}>Log-out</p> }
-                <Link key={sidePanel.rand} to={`/pokemon/${sidePanel.rand}`}>
+                <Link key={sidePanel.rand} to={`/stats/${sidePanel.rand}`}>
                     <p className="rand">Random pokemon</p>
                 </Link>   
                 <p className ="rand"onClick={async () => { 
