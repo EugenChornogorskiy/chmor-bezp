@@ -11,7 +11,7 @@ import { CreationModal } from '../components/CreationModal';
 import { Link } from 'react-router-dom';
 import { setTimeout } from 'timers/promises';
 import { useLogin } from '../contexts/Login';
-async function list( arr: any, limit=1000, offset=0,token:any,navigate:any) {
+async function list( arr: any, limit=1000, offset=0,token:any,navigate:any,addToken:any,addIdToken:any) {
     try { 
         if (arr == "list") {
             console.log(token)
@@ -27,6 +27,8 @@ async function list( arr: any, limit=1000, offset=0,token:any,navigate:any) {
         } 
     } catch (error) {
         console.log(error)
+        addToken("");
+        addIdToken("");
         navigate("/");
     }
 }    
@@ -125,7 +127,7 @@ function ClientApp( ){
     useEffect(() => { 
         async function fetchData( ) {
             const savedPokemons = localStorage.getItem(`pokemons`);
-            const data = await list("list", 50,0,token,navigate) || []; 
+            const data = await list("list", 50,0,token,navigate,addToken,addIdToken) || []; 
             const random = ([data[Math.floor(Math.random() * data.length)],data[Math.floor(Math.random() * data.length)],data[Math.floor(Math.random() * data.length)]]) 
             const top =  [ data.find((p:any) => p.name == "charizard"),data.find((p:any) => p.name == "bulbasaur")]   
             if (savedPokemons) {
@@ -145,7 +147,7 @@ function ClientApp( ){
     },[token]) 
     useEffect(() => {
         async function fetchData( ) { 
-            const data = await list("list", 50,0,token,navigate) || []; 
+            const data = await list("list", 50,0,token,navigate,addToken,addIdToken) || []; 
             const random = ([data[Math.floor(Math.random() * data.length)],data[Math.floor(Math.random() * data.length)],data[Math.floor(Math.random() * data.length)]]) 
             const top =  [ data.find((p:any) => p.name == "charizard"),data.find((p:any) => p.name == "bulbasaur")]   
             setPokemons(data)

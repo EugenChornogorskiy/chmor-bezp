@@ -7,6 +7,7 @@ import { ToastContainer } from "../components/ToastContainer";
 import { CreationModal } from '../components/CreationModal';
 import { Link } from 'react-router-dom'; 
 import { useLogin } from '../contexts/Login'; 
+import { useNavigate } from "react-router-dom";
 export default function Home() {    
   return <ClientApp />; 
 }    
@@ -21,7 +22,8 @@ function ClientApp( ){
     const [addTeam, setAddTeam] = useState<Boolean>(false); 
     const [toastList, setToastList] = useState<any>( []);  
     const [loaded, setLoaded] = useState(false); 
-    const { token }:any = useLogin(); 
+    const { token,addToken,addIdToken,idToken}:any = useLogin(); 
+    const navigate = useNavigate();
     const addToast = (type:any,value:any) => {
         const id = Date.now()
         setToastList((prev:any) => [...toastList, {type,id,value}])
@@ -95,6 +97,43 @@ function ClientApp( ){
                     "&code_challenge_method=S256" +
                     "&flow=default-source-enrollment";
     }  
+    const logOut = async () => { 
+        if (!token) {
+            navigate("/");
+            return;
+        }
+        
+        try {
+            console.log("idToken", idToken);
+            const response = await fetch('/api/auth/logout', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'X-ID-Token': idToken,
+                    'Content-Type': 'application/json'
+                }
+            });
+            
+            if (!response.ok) {
+                console.warn('Server logout failed:', await response.text()); 
+                addToken("");
+                addIdToken("");
+                navigate("/");
+                return;
+            }
+            
+            const data = await response.json();
+            console.log('Logout response:', data);
+             
+            addToken("");
+            addIdToken(""); 
+        } catch (error) {
+            console.error('Logout error:', error);
+            addToken("");
+            addIdToken("");
+            navigate("/");
+        }
+    }
     return ( 
     <div id ="root"> 
         <header>
@@ -102,6 +141,7 @@ function ClientApp( ){
                 <img id="logo"src="Pokemon-Logo.png" alt="" />  
                 {token.length == 0 && <p className="rand" onClick={() => Register()}>Register</p> }
                 {token.length == 0 && <p className="rand" onClick={() => Login()}>Login</p> } 
+                {token.length > 0 && <p className="rand" onClick={() => logOut()}>Log-out</p> }
                 <img id="nav-ball"src="master-ball2.png" alt="" /> 
             </div>
         </header>
