@@ -225,6 +225,8 @@ function ClientApp( ){
             
             if (!response.ok) {
                 console.warn('Server logout failed:', await response.text()); 
+                localStorage.removeItem('Token');
+                localStorage.removeItem('idToken');
                 addToken("");
                 addIdToken("");
                 navigate("/");
@@ -233,7 +235,8 @@ function ClientApp( ){
             
             const data = await response.json();
             console.log('Logout response:', data);
-             
+            localStorage.removeItem('Token');
+            localStorage.removeItem('idToken');
             addToken("");
             addIdToken("");
              
@@ -245,6 +248,8 @@ function ClientApp( ){
             }
         } catch (error) {
             console.error('Logout error:', error);
+            localStorage.removeItem('Token');
+            localStorage.removeItem('idToken');
             addToken("");
             addIdToken("");
             navigate("/");
