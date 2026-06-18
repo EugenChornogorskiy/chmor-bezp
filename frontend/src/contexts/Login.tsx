@@ -32,10 +32,12 @@ export const LoginProvider = ({ children }:any) => {
         headers: { Authorization: `Bearer ${token}` }
       }) 
       .catch(function (error:any) {  
+        console.log( token ); 
         setToken("");  
         setIdToken("")
-      });  
-      console.log( token ); 
+        localStorage.removeItem('Token');
+        localStorage.removeItem('idToken');
+      });   
     } 
   }, [loaded]); 
   const addToken = (action: any) => {  
