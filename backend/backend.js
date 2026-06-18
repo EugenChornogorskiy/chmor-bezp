@@ -195,6 +195,9 @@ app.get('/verify', auth, async (req, res) => {
 });
 app.get('/role', auth, async (req, res) => { 
   const email = req.query.email;
+  const name = req.query.name;
+  console.log("Email",email);
+  console.log("Name",name);
   if (!email) {
     res.status(403).json({
       message:  "unverified"
@@ -337,6 +340,9 @@ app.post("/auth/callback", async (req, res) => {
     const tokens = tokenResponse.data;
     const decodedToken = jwt.decode(tokens.access_token);
     const userEmail = decodedToken.email;
+    console.log("Email",email);
+    console.log("Name",decodedToken.name);
+    console.log("sub",decodedToken.sub);
     await pgPool.query(
       'INSERT INTO user_roles (user_email, role) VALUES ($1, $2) ON CONFLICT (user_email) DO NOTHING',
       [userEmail, 'user']
