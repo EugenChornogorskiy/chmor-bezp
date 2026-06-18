@@ -61,25 +61,7 @@ function ClientApp( ){
             .replace(/\+/g, '-')
             .replace(/\//g, '_')
             .replace(/=+$/, '');
-    }
-    useEffect(() => {
-        if (!token) {
-            const link = async function() {
-                const codeVerifier = await generateCodeVerifier();
-                const codeChallenge = await generateCodeChallenge(codeVerifier);
-                sessionStorage.setItem('pkce_verifier', codeVerifier);
-                window.location.href =
-                    "http://localhost:9000/application/o/authorize/" +
-                    "?client_id=" + (process.env.REACT_APP_CLIENT_ID || "my-app") +
-                    "&response_type=code" +
-                    "&scope=openid profile email" +
-                    "&redirect_uri=" + (process.env.REDIRECT_URI || "http://localhost/callback")  +
-                    "&code_challenge=" + codeChallenge +
-                    "&code_challenge_method=S256";
-            } 
-            link() 
-        }
-    }, [token]);
+    } 
 
     useEffect(() => {
         if (loaded) {
@@ -119,10 +101,7 @@ function ClientApp( ){
             <div id="nav-items"> 
                 <img id="logo"src="Pokemon-Logo.png" alt="" />  
                 {token.length == 0 && <p className="rand" onClick={() => Register()}>Register</p> }
-                {token.length == 0 && <p className="rand" onClick={() => Login()}>Login</p> }
-                <Link key={sidePanel.rand} to={`/pokemon/${sidePanel.rand}`}>
-                    <p className="rand">Random pokemon</p>
-                </Link>    
+                {token.length == 0 && <p className="rand" onClick={() => Login()}>Login</p> } 
                 <img id="nav-ball"src="master-ball2.png" alt="" /> 
             </div>
         </header>
