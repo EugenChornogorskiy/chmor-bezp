@@ -81,9 +81,10 @@ function ClientApp( ){
                     "&scope=openid profile email" +
                     "&redirect_uri=" + (process.env.REDIRECT_URI || "http://localhost/callback")  +
                     "&code_challenge=" + codeChallenge +
-                    "&code_challenge_method=S256";
+                    "&code_challenge_method=S256" + 
+                    "&flow=registration";
     }     
-    
+
     const logOut = async () => { 
         if (!token) {
             navigate("/");
