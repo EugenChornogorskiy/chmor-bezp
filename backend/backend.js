@@ -300,7 +300,7 @@ app.post('/auth/logout', auth, async (req, res) => {
             }
         } while (cursor !== '0');
          
-        const logoutUrl = `${AUTH_URL}/application/o/${SLUG}/end-session/`;
+        const logoutUrl = `http://localhost:9000/application/o/${SLUG}/end-session/`;
         const idToken = req.headers['x-id-token'];
         console.log('ID Token exists:', !!idToken);
         console.log('ID Token first chars:', idToken?.substring(0, 30));
