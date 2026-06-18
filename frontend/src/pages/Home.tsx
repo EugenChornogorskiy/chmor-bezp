@@ -80,37 +80,49 @@ function ClientApp( ){
             link() 
         }
     }, [token]);
+
     useEffect(() => {
         if (loaded) {
             localStorage.setItem(`pokemons`, JSON.stringify(pokemons));
         }
     }, [pokemons]); 
-    const filtfunc = (form: any, key: any,value : any) => {
-        if (form=="add") {
-            if (key == "types" || key == "abilities") {
-                setFilters((prev :any) => ({ ...prev, [key]: [...filters [key], value] }));  
-                }
-            else{
-                setFilters((prev :any) => ({ ...prev, [key]: value  }));  
-            }   
-        }
-        else if(form=="remove"){ 
-            if (key == "types" || key == "abilities") {
-                setFilters((prev :any) => ({ ...prev, [key]: filters [key].filter((p:any) => p!= value)}));   
-            }
-            else{
-                setFilters((prev :any) => ({ ...prev, [key]: value  }));   
-            } 
-        } 
-        else{
-            setFilters((prev :any) => ({ ...prev, [key]: value  }));
-        }
+    const Login = async ( ) => { 
+                const codeVerifier = await generateCodeVerifier();
+                const codeChallenge = await generateCodeChallenge(codeVerifier);
+                sessionStorage.setItem('pkce_verifier', codeVerifier);
+                window.location.href =
+                    "http://localhost:9000/application/o/authorize/" +
+                    "?client_id=" + (process.env.REACT_APP_CLIENT_ID || "my-app") +
+                    "&response_type=code" +
+                    "&scope=openid profile email" +
+                    "&redirect_uri=" + (process.env.REDIRECT_URI || "http://localhost/callback")  +
+                    "&code_challenge=" + codeChallenge +
+                    "&code_challenge_method=S256";
     }     
+    const Register = async ( ) => { 
+                const codeVerifier = await generateCodeVerifier();
+                const codeChallenge = await generateCodeChallenge(codeVerifier);
+                sessionStorage.setItem('pkce_verifier', codeVerifier);
+                window.location.href =
+                    "http://localhost:9000/application/o/authorize/" +
+                    "?client_id=" + (process.env.REACT_APP_CLIENT_ID || "my-app") +
+                    "&response_type=code" +
+                    "&scope=openid profile email" +
+                    "&redirect_uri=" + (process.env.REDIRECT_URI || "http://localhost/callback")  +
+                    "&code_challenge=" + codeChallenge +
+                    "&code_challenge_method=S256" +
+                    "&flow=default-source-enrollment";
+    }  
     return ( 
     <div id ="root"> 
         <header>
             <div id="nav-items"> 
                 <img id="logo"src="Pokemon-Logo.png" alt="" />  
+                {!token && <p className="rand" onClick={() => Register()}>Register</p> }
+                {!token && <p className="rand" onClick={() => Login()}>Login</p> }
+                <Link key={sidePanel.rand} to={`/pokemon/${sidePanel.rand}`}>
+                    <p className="rand">Random pokemon</p>
+                </Link>    
                 <img id="nav-ball"src="master-ball2.png" alt="" /> 
             </div>
         </header>
@@ -120,9 +132,9 @@ function ClientApp( ){
             </div> 
             <div id ="wrapper"> 
                 <p id = "welcome-message">Welcome to <span style={{color:"red"}}>Pokemon-Stats</span></p>
-                <Link to={"/list"}>
+                {token && <Link to={"/list"}>
                     <button id ="welcome-button">Start</button>
-                </Link>
+                </Link>}
            </div>
             <div className="random"> 
                 {comparisonList.length > 1 && <FloatingCompareButton setComparisionTable={() => setComparisionTable(!comparisionTable)} comparisonList={comparisonList} />  }
