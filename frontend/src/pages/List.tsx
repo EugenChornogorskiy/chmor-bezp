@@ -178,6 +178,9 @@ function ClientApp( ){
                 .then(res => res.json())
                 .then(data => {
                     setRole(data.role)
+                }).catch(() => {
+                    addIdToken("")
+                    addToken("")
                 });
         } 
     }, [token]); 
