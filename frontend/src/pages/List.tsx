@@ -122,7 +122,7 @@ function ClientApp( ){
             return [...prev, id];
         });
     }; 
-    useEffect(() => {
+    useEffect(() => { 
         async function fetchData( ) {
             const savedPokemons = localStorage.getItem(`pokemons`);
             const data = await list("list", 50,0,token,navigate) || []; 
@@ -138,8 +138,10 @@ function ClientApp( ){
                 const rand = Math.floor(Math.random() * 1001)
                 setSidePanel({ top, random,rand })     
             } 
+        } 
+        if (token) { 
+            fetchData()
         }
-        fetchData()
     },[token]) 
     useEffect(() => {
         async function fetchData( ) { 
