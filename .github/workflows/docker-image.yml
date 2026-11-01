@@ -191,14 +191,22 @@ jobs:
           kubectl apply -k overlays/prod
 
       - name: Wait for rollouts
-        run: | 
-          kubectl rollout status deployment/api --timeout=300s
-          kubectl rollout status deployment/nginx --timeout=300s
+        run: |
+          kubectl rollout status deployment/auth-postgres --timeout=300s
           kubectl rollout status deployment/postgres --timeout=300s
           kubectl rollout status deployment/redis --timeout=300s
-          kubectl rollout status deployment/authentik --timeout=300s
-          kubectl rollout status deployment/auth-postgres --timeout=300s
-
+          kubectl rollout status deployment/authentik --timeout=600s
+          kubectl rollout status deployment/api --timeout=300s
+          kubectl rollout status deployment/nginx --timeout=300s
+          
+      - name: Debug on failure
+        if: failure()
+        run: |
+          kubectl get pods -o wide
+          kubectl describe pod -l app=authentik
+          kubectl logs deployment/authentik --tail=100
+          kubectl get events --sort-by=.lastTimestamp | tail -30
+          
       - name: Get cluster status
         run: |
           kubectl get pods
