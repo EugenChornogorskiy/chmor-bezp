@@ -1,70 +1,90 @@
 # chmor-bezp
 
-A full-stack web application deployed on **Kubernetes** with **Kustomize**, secured by **OAuth2 (Authorization Code + PKCE)** through a self-hosted **Authentik** identity provider.
+A full-stack web application deployed on **Kubernetes** with **Kustomize**, secured by **OAuth2 (Authorization Code + PKCE)** through a self-hosted **Authentik** identity provider, and built and verified by a **GitHub Actions** CI/CD pipeline.
 
-The demo app is a small Pokémon manager: browse a list of Pokémon, create your own, and open a stats view for each one. The focus of the project is not the app itself but the infrastructure and authentication around it.
+The demo app is a Pokémon catalog: browse and filter Pokémon, search, compare and favorite them, rate and comment, create your own and open a stats view. The focus of the project is not the app itself but the infrastructure, security and automation around it.
 
-## Features
+## Highlights
 
-- **Kubernetes deployment**: frontend, backend, Nginx and Authentik run as separate services in one cluster.
-- **Kustomize layout**: shared manifests in `base/`, environment-specific changes in `overlays/prod/`.
-- **One-command deploy**: `kubectl apply -k overlays/prod`.
-- **OAuth2 with PKCE**: the frontend logs users in through Authentik without a client secret.
-- **Token verification**: the frontend keeps the token in a React context (persisted in `localStorage`) and re-checks it against the backend `verify` endpoint on load.
-- **Nginx** as the single entry point to the application.
-- **CI**: GitHub Actions workflow in `.github/workflows/`.
+- **Kubernetes + Kustomize**: shared manifests in `base/`, environment settings in `overlays/prod/`, deployed with one command.
+- **Six workloads**: API (5 replicas), Nginx with the React frontend, PostgreSQL, Redis, Authentik (server and worker) and a separate PostgreSQL for Authentik.
+- **OAuth2 with PKCE** via Authentik. The backend validates access tokens against Authentik's JWKS endpoint.
+- **Hardening**: NetworkPolicies per component, non-root containers, `allowPrivilegeEscalation: false`, resource requests and limits.
+- **Reliability**: liveness, readiness and startup probes, init containers that wait for databases, a PodDisruptionBudget for the API, persistent volumes for databases and Redis.
+- **Two-layer caching**: Redis cache for `/stats` in the backend, plus an Nginx `proxy_cache` in front of it (visible in the `X-Cache` and `X-Cache-Status` headers).
+- **Observability**: Prometheus metrics at `/metrics` (`prom-client`) and a `/health` endpoint that reports database and Redis status.
+- **CI/CD**: tests with real PostgreSQL and Redis service containers, image builds pushed to GitHub Container Registry, and a deployment smoke test on a temporary Minikube cluster.
 
 ## Architecture
 
 ```
-                 ┌──────────────┐
- Browser ───────▶│    Nginx     │
-                 └──────┬───────┘
-                        │
-          ┌─────────────┴─────────────┐
-          ▼                           ▼
-   ┌─────────────┐             ┌─────────────┐
-   │  Frontend   │             │   Backend   │
-   │   (React)   │             │ (REST API)  │
-   └──────┬──────┘             └──────┬──────┘
-          │  login (PKCE)             │  verify token
-          ▼                           ▼
-                 ┌──────────────┐
-                 │  Authentik   │
-                 │  (OAuth2 IdP)│
-                 └──────────────┘
+                    Browser
+                       │
+                       ▼
+               ┌───────────────┐
+               │     Nginx     │  serves the React app,
+               │ (frontend img)│  proxies /api/ to the API
+               └───────┬───────┘
+                       │ /api/
+                       ▼
+               ┌───────────────┐   verifies tokens (JWKS)   ┌─────────────────┐
+               │  API (x5)     │───────────────────────────▶│   Authentik     │
+               │ Node/Express  │                            │ server + worker │
+               └───┬───────┬───┘                            └────────┬────────┘
+                   │       │                                         │
+                   ▼       ▼                                         ▼
+            ┌──────────┐ ┌───────┐                          ┌─────────────────┐
+            │PostgreSQL│ │ Redis │ ◀── cache / sessions     │ PostgreSQL (auth)│
+            └──────────┘ └───────┘                          └─────────────────┘
 ```
+
+Traffic between pods is limited by NetworkPolicies, so each component can only talk to the services it actually needs.
+
+## How authentication works
+
+1. The frontend creates a PKCE code verifier and challenge and redirects the user to Authentik.
+2. After login, Authentik redirects back to `/callback` with an authorization code.
+3. The frontend sends the code and the verifier to the backend (`POST /auth/callback`), which exchanges them for tokens.
+4. The access token is kept in a React context. Protected endpoints require it, and the backend checks its signature with the keys published by Authentik.
+5. `GET /verify` lets the frontend confirm that a stored token is still valid on load. `POST /auth/logout` clears the user's cached data in Redis.
+
+## CI/CD pipeline
+
+Defined in `.github/workflows/docker-image.yml`:
+
+| Job | Runs on | What it does |
+|-----|---------|--------------|
+| `test-backend` | push and pull request | Installs the backend, runs Jest unit tests (with coverage) against PostgreSQL 15 and Redis 7 service containers, uploads the coverage report |
+| `build-backend`, `build-frontend` | push to `new` | Build Docker images and push them to GitHub Container Registry, tagged `latest` and with the commit SHA |
+| `deploy` | push to `new` | Starts a temporary Minikube cluster, applies `overlays/prod`, waits for every deployment with `kubectl rollout status` and prints the cluster state. On failure it prints pod descriptions, logs and events for debugging |
+
+The `deploy` job is a smoke test: it proves that the manifests apply cleanly and every service becomes ready. It does not deploy to a permanent environment.
 
 ## Repository structure
 
 | Path | Purpose |
 |------|---------|
-| `base/` | Core Kubernetes manifests (Deployments, Services, config) |
-| `overlays/prod/` | Production overlay applied with Kustomize |
-| `backend/` | Backend API source code |
-| `frontend/` | React client source code |
-| `.github/workflows/` | CI pipeline |
-
-## Prerequisites
-
-- A Kubernetes cluster, for example [minikube](https://minikube.sigs.k8s.io/), [kind](https://kind.sigs.k8s.io/) or Docker Desktop with Kubernetes enabled
-- [`kubectl`](https://kubernetes.io/docs/tasks/tools/) (Kustomize support is built in)
-- Docker, if you want to rebuild the images yourself
+| `base/` | Kubernetes manifests: Deployments, Services, NetworkPolicies, PVCs, PodDisruptionBudget, ConfigMaps |
+| `overlays/prod/` | Overlay with environment config and generated Secrets |
+| `backend/` | Node.js / Express API, Dockerfile and Jest tests |
+| `frontend/` | React (TypeScript) client, Nginx config and Dockerfile |
+| `.github/workflows/` | CI/CD pipeline |
 
 ## Getting started
 
-### 1. Deploy to the cluster
+### Prerequisites
+
+- A Kubernetes cluster, for example [minikube](https://minikube.sigs.k8s.io/), [kind](https://kind.sigs.k8s.io/) or Docker Desktop with Kubernetes enabled
+- [`kubectl`](https://kubernetes.io/docs/tasks/tools/) (Kustomize support is built in)
+
+### 1. Deploy
 
 ```bash
 kubectl apply -k overlays/prod
-```
-
-Check that everything is running:
-
-```bash
 kubectl get pods
-kubectl get services
 ```
+
+Wait until all pods are `Running`. Authentik can take a minute or two on the first start because it migrates its database.
 
 ### 2. Expose the services locally
 
@@ -78,39 +98,42 @@ Start-Job { kubectl port-forward service/authentik 9000:9000 }
 **Linux / macOS:**
 
 ```bash
-kubectl port-forward service/nginx 8080:80 &
+sudo kubectl port-forward service/nginx 80:80 &
 kubectl port-forward service/authentik 9000:9000 &
 ```
 
-(On Linux and macOS port 80 needs elevated privileges, so 8080 is used instead.)
+Port 80 is used because the redirect URI is `http://localhost/callback`.
 
-### 3. Open the app
+### 3. Configure Authentik (first run only)
 
-- Application: <http://localhost> (or <http://localhost:8080> on Linux/macOS)
-- Authentik: <http://localhost:9000>
+Open <http://localhost:9000>, finish the initial setup, then create an **OAuth2/OpenID provider** and an **application** that match the values in `overlays/prod/kustomization.yaml`:
 
-<!-- TODO: if Authentik needs a one-time setup (an OAuth2 provider and application with the redirect URI), list the steps here. -->
+| Setting | Value |
+|---------|-------|
+| Application slug | `my-app` |
+| Client ID | `my-app` |
+| Client secret | `secret` |
+| Redirect URI | `http://localhost/callback` |
 
-## How authentication works
+### 4. Open the app
 
-1. The user opens the frontend and clicks **Log in**.
-2. The frontend generates a PKCE code verifier and challenge and redirects to Authentik.
-3. After login, Authentik redirects back with an authorization code.
-4. The frontend exchanges the code (plus the verifier) for an access token.
-5. The token is stored in a React context and in `localStorage`.
-6. On every page load the stored token is sent to the backend `verify` endpoint. If it is invalid or expired, the user is sent back to login.
+Go to <http://localhost> and log in through Authentik.
 
-PKCE removes the need for a client secret in the browser, which is why it is the recommended flow for single-page apps.
+> The credentials in `overlays/prod` (`secret`, `postgres`) are demo values for local use. Replace them before running this anywhere real.
+
+## Running the tests
+
+```bash
+cd backend
+npm ci
+npm run test:unit
+```
+
+The tests need PostgreSQL and Redis. The CI pipeline provides them as service containers.
 
 ## Tech stack
 
-Kubernetes · Kustomize · Docker · Nginx · Authentik · OAuth2 / PKCE · React · REST API · GitHub Actions
-
-## Cleanup
-
-```bash
-kubectl delete -k overlays/prod
-```
+Kubernetes · Kustomize · Docker · Nginx · Authentik · OAuth2 / PKCE · Node.js · Express · React · TypeScript · PostgreSQL · Redis · Prometheus client · Jest · GitHub Actions · Minikube
 
 ## Author
 
