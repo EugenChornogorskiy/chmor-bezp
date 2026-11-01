@@ -16,7 +16,7 @@ spec:
     spec: 
       containers: 
         - name: authentik-server
-          image: ghcr.io/goauthentik/server:latest   
+          image: ghcr.io/goauthentik/server:2026.5   
           args: ["worker"] 
           env:
             - name: AUTHENTIK_POSTGRESQL__HOST
