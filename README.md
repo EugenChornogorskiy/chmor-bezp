@@ -35,8 +35,6 @@ The demo app is a small Pokémon manager: browse a list of Pokémon, create your
                  └──────────────┘
 ```
 
-<!-- TODO: adjust the diagram if the real routing differs (for example, if the frontend is served by Nginx directly). -->
-
 ## Repository structure
 
 | Path | Purpose |
@@ -45,7 +43,6 @@ The demo app is a small Pokémon manager: browse a list of Pokémon, create your
 | `overlays/prod/` | Production overlay applied with Kustomize |
 | `backend/` | Backend API source code |
 | `frontend/` | React client source code |
-| `key/` | Kubernetes files |
 | `.github/workflows/` | CI pipeline |
 
 ## Prerequisites
